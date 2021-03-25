@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UniModules.UniGame.Rx.Runtime.Operations;
 using UniRx;
 using UnityEngine.UI;
@@ -20,6 +21,13 @@ namespace UniModules.UniGame.Rx.Runtime.Extensions
             }
 
             return ToChain(source).AddToChain(other);
+        }
+
+        public static IObservable<T> BatchPlayerTiming<T>(this IObservable<T> source, int frameCount = 1,PlayerLoopTiming timing = PlayerLoopTiming.Update)
+        {
+
+            return new BatchPlayerTimingObservable<T>(source, frameCount, timing);
+
         }
     }
 }
