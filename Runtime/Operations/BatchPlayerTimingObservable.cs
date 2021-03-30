@@ -29,6 +29,15 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public void OnNext(TSource source)
         {
+            lock (this)
+            {
+                if (!isActive)
+                {
+                    isActive = true;
+                    UpdateTiming(_timing, _frameCount, _tokenSource);
+                }
+            }
+
             _value = source;
             _isValueUpdated = true;
         }
@@ -47,11 +56,6 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public IDisposable Subscribe(IObserver<TSource> observer)
         {
-            if (!isActive)
-            {
-                UpdateTiming(_timing, _frameCount, _tokenSource);
-            }
-            
             return _observable.Subscribe(observer);
         }
 
@@ -63,18 +67,20 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         private async UniTask UpdateTiming(PlayerLoopTiming loopTiming,int awaitAmount,CancellationTokenSource source)
         {
+            isActive = true;
+            
             var count = 0;
-            while (!source.IsCancellationRequested)
+            
+            while (!source.IsCancellationRequested && count < awaitAmount)
             {
-                if (count >= awaitAmount && _isValueUpdated)
-                {
-                    _observable.OnNext(_value);
-                    _isValueUpdated = false;
-                    count = 0;
-                }
                 await UniTask.Yield(loopTiming);
                 count++;
             }
+            
+            _observable.OnNext(_value);
+            _isValueUpdated = false;
+            
+            isActive = false;
         }
     }
 
