@@ -2,11 +2,10 @@
 using Cysharp.Threading.Tasks;
 using UniModules.UniGame.Rx.Runtime.Operations;
 using UniRx;
-using UnityEngine.UI;
 
 namespace UniModules.UniGame.Rx.Runtime.Extensions
 {
-    public static class ExObservableExtensions
+    public static class RxObservableExtensions
     {
     
         public static IObservable<T> ToChain<T>(this IObservable<T> source, IObservable<Unit> skipSource = null)
