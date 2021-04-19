@@ -12,6 +12,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
         private PlayerLoopTiming _timing = PlayerLoopTiming.Update;
         private bool _isActive = false;
+        private bool _isValueChanged = false;
         private TSource _value;
         private Subject<TSource> _observable = new Subject<TSource>();
         private CompositeDisposable _compositeDisposable = new CompositeDisposable();
@@ -39,6 +40,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
                 }
             }
 
+            _isValueChanged = true;
             _value = source;
         }
         
@@ -56,8 +58,11 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public IDisposable Subscribe(IObserver<TSource> observer)
         {
-            if(_compositeDisposable.IsDisposed)
+            if (_compositeDisposable.IsDisposed)
+            {
+                if(_isValueChanged) observer?.OnNext(_value);
                 return Disposable.Empty;
+            }
             return _observable.Subscribe(observer);
         }
 
