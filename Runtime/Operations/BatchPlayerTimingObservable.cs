@@ -8,12 +8,11 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
     public class BatchPlayerTimingObservable<TSource> : IObservable<TSource>, IObserver<TSource>, IDisposable
     {
         private readonly int _frameCount;
+        
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
         private PlayerLoopTiming _timing = PlayerLoopTiming.Update;
-        private bool isActive = false;
-        
+        private bool _isActive = false;
         private TSource _value;
-        private bool _isValueUpdated;
         private Subject<TSource> _observable = new Subject<TSource>();
         private CompositeDisposable _compositeDisposable = new CompositeDisposable();
 
@@ -22,7 +21,9 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
             _frameCount = frameCount;
             _timing = timing;
 
-            source.Subscribe(this).AddTo(_compositeDisposable);
+            source.Subscribe(this)
+                .AddTo(_compositeDisposable);
+            
             _compositeDisposable.Add(_observable);
             _compositeDisposable.Add(_tokenSource);
         }
@@ -31,15 +32,14 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
         {
             lock (this)
             {
-                if (!isActive)
+                if (!_isActive)
                 {
-                    isActive = true;
+                    _isActive = true;
                     UpdateTiming(_timing, _frameCount, _tokenSource);
                 }
             }
 
             _value = source;
-            _isValueUpdated = true;
         }
         
         public void OnError(Exception error)
@@ -56,6 +56,8 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public IDisposable Subscribe(IObserver<TSource> observer)
         {
+            if(_compositeDisposable.IsDisposed)
+                return Disposable.Empty;
             return _observable.Subscribe(observer);
         }
 
@@ -67,7 +69,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         private async UniTask UpdateTiming(PlayerLoopTiming loopTiming,int awaitAmount,CancellationTokenSource source)
         {
-            isActive = true;
+            _isActive = true;
             
             var count = 0;
             
@@ -77,10 +79,11 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
                 count++;
             }
             
-            _observable.OnNext(_value);
-            _isValueUpdated = false;
+            _isActive = false;
             
-            isActive = false;
+            if(!source.IsCancellationRequested)
+                _observable.OnNext(_value);
+            
         }
     }
 
