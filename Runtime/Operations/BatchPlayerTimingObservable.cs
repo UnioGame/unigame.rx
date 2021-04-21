@@ -33,7 +33,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
         {
             lock (this)
             {
-                if (!_isActive)
+                if (!_isActive && _observable.HasObservers)
                 {
                     _isActive = true;
                     UpdateTiming(_timing, _frameCount, _tokenSource);
@@ -63,7 +63,11 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
                 if(_isValueChanged) observer?.OnNext(_value);
                 return Disposable.Empty;
             }
-            return _observable.Subscribe(observer);
+            
+            var disposable = _observable.Subscribe(observer);
+            if(_isValueChanged)
+                observer.OnNext(_value);
+            return disposable;
         }
 
         public void Dispose()
