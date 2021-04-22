@@ -1,6 +1,6 @@
 using System;
-using System.Threading;
 using Cysharp.Threading.Tasks;
+using UniModules.UniGame.Core.Runtime.Extension;
 using UniRx;
 
 namespace UniModules.UniGame.Rx.Runtime.Operations
@@ -9,7 +9,6 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
     {
         private readonly int _frameCount;
         
-        private CancellationTokenSource _tokenSource = new CancellationTokenSource();
         private PlayerLoopTiming _timing = PlayerLoopTiming.Update;
         private bool _isActive = false;
         private bool _isValueChanged = false;
@@ -26,22 +25,31 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
                 .AddTo(_compositeDisposable);
             
             _compositeDisposable.Add(_observable);
-            _compositeDisposable.Add(_tokenSource);
         }
 
         public void OnNext(TSource source)
         {
+            
+            _isValueChanged = true;
+            _value = source;
+            
             lock (this)
             {
                 if (!_isActive && _observable.HasObservers)
                 {
                     _isActive = true;
-                    UpdateTiming(_timing, _frameCount, _tokenSource);
+                    
+                    this.AwaitTiming(_timing, _frameCount)
+                        .ToObservable()
+                        .DoOnCompleted(() =>
+                        {
+                            _observable.OnNext(_value);
+                            _isActive = false;
+                        })
+                        .Subscribe()
+                        .AddTo(_compositeDisposable);
                 }
             }
-
-            _isValueChanged = true;
-            _value = source;
         }
         
         public void OnError(Exception error)
@@ -58,42 +66,18 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public IDisposable Subscribe(IObserver<TSource> observer)
         {
-            if (_compositeDisposable.IsDisposed)
-            {
-                if(_isValueChanged) observer?.OnNext(_value);
-                return Disposable.Empty;
-            }
+            var disposable =_compositeDisposable.IsDisposed ?
+                Disposable.Empty:
+                _observable.Subscribe(observer);
             
-            var disposable = _observable.Subscribe(observer);
             if(_isValueChanged)
                 observer.OnNext(_value);
+            
             return disposable;
         }
 
-        public void Dispose()
-        {
-            _tokenSource.Cancel(false);
-            _compositeDisposable.Dispose();
-        }
+        public void Dispose() => _compositeDisposable.Dispose();
 
-        private async UniTask UpdateTiming(PlayerLoopTiming loopTiming,int awaitAmount,CancellationTokenSource source)
-        {
-            _isActive = true;
-            
-            var count = 0;
-            
-            while (!source.IsCancellationRequested && count < awaitAmount)
-            {
-                await UniTask.Yield(loopTiming);
-                count++;
-            }
-            
-            _isActive = false;
-            
-            if(!source.IsCancellationRequested)
-                _observable.OnNext(_value);
-            
-        }
     }
 
 }
