@@ -5,15 +5,15 @@
   "description": "Rx Extensions",
   "homepage": "https://github.com/UniGameTeam/UniGame.Rx#README",
   "unity": "2019.2",
-  "version": "2021.0.33",
+  "version": "2021.0.34",
   "keywords": [
     "dotween",
     "rx"
   ],
   "dependencies": {
-    "com.unigame.neuecc.unirx": "7.1.1",
+    "com.unigame.neuecc.unirx": "7.1.2",
     "com.unigame.neuecc.unitask": "2.2.3",
-    "com.unigame.unicore": "2021.1.7"
+    "com.unigame.unicore": "2021.1.8"
   },
   "repository": {
     "type": "git",
