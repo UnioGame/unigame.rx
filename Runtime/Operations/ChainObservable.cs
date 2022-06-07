@@ -51,7 +51,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
             public IDisposable Run()
             {
-                var skipHandler = _parent._skipSource?.RxSubscribe(_ => _currentChainElement?.OnCompleted());
+                var skipHandler = _parent._skipSource?.Subscribe(_ => _currentChainElement?.OnCompleted());
 
                 var disposable = new SingleAssignmentDisposable();
                 _serialDisposable.Disposable = disposable;

@@ -46,7 +46,7 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
                             _observable.OnNext(_value);
                             _isActive = false;
                         })
-                        .RxSubscribe()
+                        .Subscribe()
                         .AddTo(_compositeDisposable);
                 }
             }
