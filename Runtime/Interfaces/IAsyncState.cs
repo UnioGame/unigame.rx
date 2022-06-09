@@ -1,7 +1,5 @@
 ﻿namespace UniModules.UniGame.Core.Runtime.Interfaces
 {
-    using UniRx;
-
     public interface IAsyncState : IAsyncState<AsyncStatus>
     {
     }

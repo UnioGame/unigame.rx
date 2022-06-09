@@ -1,5 +1,5 @@
 {
-    "name": "unigame.unicore.tests",
+    "name": "unigame.rx.runtime.tests",
     "rootNamespace": "",
     "references": [
         "GUID:a0b431bd9232ee0439a3722ec36414ed",

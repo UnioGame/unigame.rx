@@ -1,4 +1,6 @@
-﻿namespace UniModules.UniCore.Runtime.ObjectPool.Runtime.Extensions
+﻿using UniModules.UniCore.Runtime.Extension;
+
+namespace UniModules.UniCore.Runtime.ObjectPool.Runtime.Extensions
 {
     using System;
     using System.Collections;

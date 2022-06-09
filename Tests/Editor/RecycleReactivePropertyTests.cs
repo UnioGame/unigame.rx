@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UniModules.UniGame.Core.Runtime.Rx;
 using UniRx;
 using UnityEngine;

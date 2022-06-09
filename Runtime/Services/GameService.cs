@@ -1,4 +1,5 @@
 ﻿using System;
+using UniModules.UniGameFlow.GameFlow.Runtime.Interfaces;
 
 namespace UniGame.UniNodes.GameFlow.Runtime
 {
@@ -6,7 +7,6 @@ namespace UniGame.UniNodes.GameFlow.Runtime
     using UniModules.UniCore.Runtime.DataFlow;
     using UniModules.UniGame.Core.Runtime.DataFlow.Interfaces;
     using UniModules.UniGame.Core.Runtime.Interfaces;
-    using UniModules.UniGameFlow.GameFlow.Runtime.Interfaces;
     using UniRx;
 
     /// <summary>
