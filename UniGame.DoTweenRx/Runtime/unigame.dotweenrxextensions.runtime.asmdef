@@ -1,6 +1,8 @@
 {
     "name": "unigame.dotweenrx.runtime",
+    "rootNamespace": "",
     "references": [
+        "unigame.unicore.runtime",
         "UniRx",
         "DOTween.Modules",
         "DOTweenPro.Scripts",
