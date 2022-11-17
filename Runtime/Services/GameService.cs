@@ -1,5 +1,5 @@
 ﻿using System;
-using UniModules.UniGameFlow.GameFlow.Runtime.Interfaces;
+using UniGame.GameFlow.Runtime.Interfaces;
 
 namespace UniGame.UniNodes.GameFlow.Runtime
 {

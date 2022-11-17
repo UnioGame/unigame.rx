@@ -1,13 +1,12 @@
-﻿namespace UniModules.UniGameFlow.GameFlow.Runtime.Interfaces
+﻿using UniModules.UniGame.Core.Runtime.Interfaces;
+
+namespace UniGame.GameFlow.Runtime.Interfaces
 {
     using System;
-    using UniGame.Core.Runtime.Interfaces;
 
     public interface IGameService : 
         IDisposable, 
-        ILifeTimeContext, 
-        IReactiveStatus
+        ILifeTimeContext
     {
-        void Complete();
     }
 }

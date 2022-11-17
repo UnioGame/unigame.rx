@@ -7,12 +7,11 @@
     using UniGame.Core.Runtime.Rx;
 
     [Serializable]
-    public class ContextValue<TData> : IDataValue<TData> , IPoolable
+    public class ReactiveValue<TData> : IDataValue<TData> , IPoolable
     {
         private bool hasValue = false;
         private bool isValueType = typeof(TData).IsValueType;
-        
-        protected RecycleReactiveProperty<TData> _reactiveValue = new RecycleReactiveProperty<TData>();
+        private RecycleReactiveProperty<TData> _reactiveValue = new RecycleReactiveProperty<TData>();
 
         public TData Value
         {
