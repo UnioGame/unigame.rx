@@ -355,7 +355,8 @@ namespace UniModules.Rx.Extensions
         public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action, ILifeTime lifeTime)
         {
             if (action == null) return sender;
-            source.Subscribe(action).AddTo(lifeTime);
+            source.Subscribe(action)
+                .AddTo(lifeTime);
             return sender;
         }
         
