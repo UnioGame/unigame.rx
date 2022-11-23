@@ -1,11 +1,10 @@
 ﻿using UniModules.UniCore.Runtime.Extension;
 
-namespace UniModules.UniCore.Runtime.ObjectPool.Runtime.Extensions
+namespace UniGame.Runtime.ObjectPool.Extensions
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using Rx.Extensions;
     using UniRx;
     using UnityEngine;
 

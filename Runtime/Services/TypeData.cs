@@ -4,11 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using ObjectPool.Runtime;
-    using ObjectPool.Runtime.Extensions;
-    using ObjectPool.Runtime.Interfaces;
-    using UniGame.Core.Runtime.Interfaces;
-    using UniGame.Core.Runtime.Interfaces.Rx;
+    using global::UniGame.Core.Runtime;
+    using global::UniGame.Core.Runtime.Rx;
     using UniGame.Core.Runtime.Rx;
 
     [Serializable]

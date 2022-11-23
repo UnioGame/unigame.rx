@@ -3,9 +3,9 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
-    using ObjectPool.Runtime;
+    using global::UniGame.Runtime.ObjectPool;
     using Rx;
-    using UniGame.Core.Runtime.Interfaces.Rx;
+    using global::UniGame.Core.Runtime.Rx;
     using UniRx;
 
     public static class RxExtension

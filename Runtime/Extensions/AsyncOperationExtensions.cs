@@ -5,8 +5,8 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Cysharp.Threading.Tasks;
-    using ObjectPool.Runtime;
-    using ObjectPool.Runtime.Extensions;
+    using global::UniGame.Runtime.ObjectPool;
+    using global::UniGame.Runtime.ObjectPool.Extensions;
     using UniRx;
     using UnityEngine;
 

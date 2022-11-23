@@ -3,11 +3,10 @@
     using System;
     using System.Collections.Generic;
     using global::UniGame.Core.Runtime.Utils;
-    using Interfaces.Rx;
-    using UniCore.Runtime.Attributes;
-    using UniCore.Runtime.ObjectPool.Runtime;
-    using UniCore.Runtime.ObjectPool.Runtime.Extensions;
-    using UniCore.Runtime.ObjectPool.Runtime.Interfaces;
+    using global::UniGame.Core.Runtime.Rx;
+    using global::UniCore.Runtime.Attributes;
+    using global::UniGame.Runtime.ObjectPool.Extensions;
+    using global::UniGame.Core.Runtime.ObjectPool;
     using UniRx;
     using UnityEngine;
 

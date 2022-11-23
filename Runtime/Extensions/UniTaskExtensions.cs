@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
-namespace UniModules.UniGame.Core.Runtime.Extension
+namespace UniGame.Core.Runtime.Extension
 {
     public static class UniTaskExtensions
     {
@@ -17,6 +18,25 @@ namespace UniModules.UniGame.Core.Runtime.Extension
                 await UniTask.Yield(loopTiming);
                 count++;
             }
+        }
+
+        public static async UniTask<TAsset> ToSharedInstanceAsync<TAsset>(
+            this UniTask<TAsset> task, ILifeTime lifeTime)
+            where TAsset : class
+        {
+            var instance = await ToSharedInstanceAsync(task);
+            if(instance is Object asset)
+                asset.DestroyWith(lifeTime);
+            return instance;
+        }
+        
+        public static async UniTask<TAsset> ToSharedInstanceAsync<TAsset>(
+            this UniTask<TAsset> task)  
+            where TAsset : class
+        {
+            var asset = await task;
+            var instance = asset.ToSharedInstance();
+            return instance;
         }
     }
 }

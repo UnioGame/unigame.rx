@@ -5,8 +5,7 @@ namespace UniGame.UniNodes.GameFlow.Runtime
 {
     using Cysharp.Threading.Tasks;
     using UniModules.UniCore.Runtime.DataFlow;
-    using UniModules.UniGame.Core.Runtime.DataFlow.Interfaces;
-    using UniModules.UniGame.Core.Runtime.Interfaces;
+    using Core.Runtime;
     using UniRx;
 
     /// <summary>

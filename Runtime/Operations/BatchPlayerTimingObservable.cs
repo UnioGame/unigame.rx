@@ -1,6 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
-using UniModules.UniGame.Core.Runtime.Extension;
+using UniGame.Core.Runtime.Extension;
 using UniRx;
 
 namespace UniModules.UniGame.Rx.Runtime.Operations

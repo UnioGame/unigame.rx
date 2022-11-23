@@ -1,7 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UniModules.UniCore.Runtime.Extension;
-using UniModules.UniGame.Core.Runtime.DataFlow.Interfaces;
+using UniGame.Core.Runtime;
 using UniRx;
 
 public static class ReactiveCollectionAsyncExtensions 

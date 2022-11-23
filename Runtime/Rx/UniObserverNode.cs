@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading;
-    using UniCore.Runtime.ObjectPool.Runtime.Interfaces;
+    using global::UniGame.Core.Runtime.ObjectPool;
 
     public sealed class UniObserverNode<T> : IObserver<T>, IDisposable, IPoolable
     {

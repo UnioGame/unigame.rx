@@ -5,7 +5,7 @@ namespace UniModules.UniGame.Core.Runtime.AsyncOperations
     using System;
     using Common;
     using Cysharp.Threading.Tasks;
-    using Interfaces;
+    using global::UniGame.Core.Runtime;
 
     
     [Serializable]

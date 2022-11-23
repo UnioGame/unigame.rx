@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace UniModules.UniGame.Core.Runtime.Rx.Extensions
+﻿namespace UniModules.UniGame.Core.Runtime.Rx.Extensions
 {
 
 }

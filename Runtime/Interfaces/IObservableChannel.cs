@@ -1,4 +1,4 @@
-﻿namespace Taktika.Analytics.Runtime
+﻿namespace UniGame.Analytics.Runtime
 {
     using System;
 

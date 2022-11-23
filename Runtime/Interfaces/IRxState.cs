@@ -1,7 +1,6 @@
-﻿namespace UniModules.UniGame.Core.Runtime.Interfaces
+﻿namespace UniGame.Core.Runtime
 {
     using System;
-    using DataFlow.Interfaces;
     using UniRx;
 
     public interface IRxCommand<TValue, TResult>

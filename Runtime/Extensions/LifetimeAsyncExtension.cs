@@ -1,7 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UniCore.Runtime.ProfilerTools;
-using UniModules.UniGame.Core.Runtime.DataFlow.Interfaces;
+using UniGame.Core.Runtime;
 using UnityEngine;
 
 public static class LifetimeAsyncExtension 

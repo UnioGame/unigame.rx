@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-namespace UniModules.UniGame.Core.Runtime.Interfaces
+namespace UniGame.Core.Runtime
 {
     public interface IAsyncFactory<TResult>
     {

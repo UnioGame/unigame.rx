@@ -3,7 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using Core.Runtime.Extension;
+    using global::UniGame.Core.Runtime.Extension;
     using Cysharp.Threading.Tasks;
     using UnityEngine;
 

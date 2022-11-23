@@ -1,7 +1,7 @@
-namespace UniModules.UniGame.Core.Runtime.Interfaces
-{
-    using UniCore.Runtime.ObjectPool.Runtime.Interfaces;
+using UniGame.Core.Runtime.ObjectPool;
 
+namespace UniGame.Core.Runtime
+{
     public interface IState : 
         ICommand, 
         IEndPoint,
