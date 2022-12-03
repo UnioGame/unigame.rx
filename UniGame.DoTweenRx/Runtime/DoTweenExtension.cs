@@ -1,6 +1,7 @@
+using UniGame.Core.Runtime;
+
 namespace UniModules.UniGame.DoTweenRoutines.Runtime
 {
-    using Core.Runtime.DataFlow.Interfaces;
     using DG.Tweening;
     using UnityEngine;
 
