@@ -109,7 +109,9 @@ namespace UniGame.Rx.Runtime.Extensions
         public static TView Bind<TView>(this TView view, IObservable<Sprite> source, Image image)
             where TView : ILifeTimeContext
         {
-            return !image ? view : view.Bind(source.Where(x => x!=null), x => image.SetValue(x) );
+            return !image 
+                ? view 
+                : view.Bind(source.Where(x => x!=null), x => image.SetValue(x) );
         }
 
         #endregion
