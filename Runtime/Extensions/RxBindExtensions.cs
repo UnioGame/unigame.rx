@@ -22,7 +22,9 @@ namespace UniGame.Rx.Runtime.Extensions
             return view.Bind(source, observer.OnNext);
         }
         
-        public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, IReactiveProperty<TValue> value)
+        public static TView Bind<TView,TValue>(this TView view, 
+            IObservable<TValue> source,
+            IReactiveProperty<TValue> value)
             where TView : ILifeTimeContext
         {
             return view.Bind(source, x => value.Value = x);
@@ -226,7 +228,8 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender;
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, 
+        public static T Bind<T, TValue>(this T sender, 
+            IObservable<TValue> source, 
             IReactiveCommand<TValue> action,
             ILifeTime lifeTime)
         {

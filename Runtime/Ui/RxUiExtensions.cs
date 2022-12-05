@@ -92,6 +92,14 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             return !source ? view : view.Bind(source.OnValueChangedAsObservable(), value);
         }
+        
+        public static TSource Bind<TSource>(this TSource view, Toggle source, IReactiveCommand<bool> value)
+            where TSource : ILifeTimeContext
+        {
+            if (source == null) return view;
+            var observable = source.OnValueChangedAsObservable();
+            return view.Bind(observable, value, view.LifeTime);
+        }
 
         public static TView Bind<TView>(this TView view, Toggle source, Action<bool> value)
             where TView : ILifeTimeContext
