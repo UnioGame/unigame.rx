@@ -1,4 +1,6 @@
-﻿namespace UniGame.UI.Components
+﻿#if ENABLE_DOTWEEN
+
+namespace UniGame.UI.Components
 {
     using DG.Tweening;
     using UniModules.UniGame.DoTweenRoutines.Runtime;
@@ -65,4 +67,7 @@
             DoTweenExtension.KillSequence(ref _bounceSequence);
         }
     }
+
 }
+
+#endif

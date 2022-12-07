@@ -1,4 +1,6 @@
-﻿namespace UniGame.Utils.Runtime
+﻿#if ENABLE_DOTWEEN
+
+namespace UniGame.Utils.Runtime
 {
     using System;
     using DG.Tweening;
@@ -50,3 +52,5 @@
         }
     }
 }
+
+#endif

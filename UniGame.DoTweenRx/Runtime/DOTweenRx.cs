@@ -1,3 +1,5 @@
+#if ENABLE_DOTWEEN
+
 using System;
 using DG.Tweening;
 using UniRx;
@@ -149,3 +151,5 @@ namespace UniGame.DOTweenRx.Runtime
 #endif //DOTweenPro Extensions
     }
 }
+
+#endif

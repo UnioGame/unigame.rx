@@ -1,7 +1,11 @@
+#if ENABLE_DOTWEEN
+
 using UniGame.Core.Runtime;
 
 namespace UniModules.UniGame.DoTweenRoutines.Runtime
 {
+    
+
     using DG.Tweening;
     using UnityEngine;
 
@@ -40,4 +44,9 @@ namespace UniModules.UniGame.DoTweenRoutines.Runtime
             tween = null;
         }
     }
+    
+    
 }
+
+
+#endif
