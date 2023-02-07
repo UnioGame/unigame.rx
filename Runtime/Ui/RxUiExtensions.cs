@@ -121,7 +121,7 @@ namespace UniGame.Rx.Runtime.Extensions
                 ? view 
                 : view.Bind(source.Where(x => x!=null), x => image.SetValue(x) );
         }
-        
+
         public static TView Bind<TView>(this TView view, IObservable<Texture> source, RawImage image)
             where TView : ILifeTimeContext
         {
