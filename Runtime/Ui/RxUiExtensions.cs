@@ -21,6 +21,14 @@ namespace UniGame.Rx.Runtime.Extensions
             if (command == null) return sender;
             return sender.Bind(source,x => command.onClick?.Invoke());
         }
+        
+        public static TView Bind<TView>(this TView sender, IObservable<float> source, Slider slider)
+            where TView : ILifeTimeContext
+        {
+            return source == null || slider == null 
+                ? sender 
+                : sender.Bind(source, x => slider.value = x);
+        }
 
         public static TView Bind<TView>(this TView sender, Button source, Action<Unit> command, int throttleTime = 0)
             where TView : ILifeTimeContext
