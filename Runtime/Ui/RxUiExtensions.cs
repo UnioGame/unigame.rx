@@ -6,6 +6,7 @@ namespace UniGame.Rx.Runtime.Extensions
     using System;
     using TMPro;
     using UniGame.Core.Runtime;
+    using UniGame.Runtime.Common;
     using UniModules.UniCore.Runtime.Utils;
     using UniModules.UniUiSystem.Runtime.Utils;
     using UniRx;
@@ -34,6 +35,14 @@ namespace UniGame.Rx.Runtime.Extensions
             where TView : ILifeTimeContext
         {
             return source == null ? sender : sender.Bind(source, () => command(Unit.Default), throttleTime);
+        }
+        
+        public static TView Bind<TView>(this TView sender, Button source, 
+            ISingleValueProperty<bool> value, int throttleTime = 0)
+            where TView : ILifeTimeContext
+        {
+            return source == null ? sender 
+                : sender.Bind(source, () => value.SetValue(true) , throttleTime);
         }
         
         public static TView Bind<TView>(this TView sender, Button source, Action<Unit> command, TimeSpan throttleTime)
