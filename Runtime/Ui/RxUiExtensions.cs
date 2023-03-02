@@ -38,7 +38,7 @@ namespace UniGame.Rx.Runtime.Extensions
         }
         
         public static TView Bind<TView>(this TView sender, Button source, 
-            ISingleValueProperty<bool> value, int throttleTime = 0)
+            ISignaleValueProperty<bool> value, int throttleTime = 0)
             where TView : ILifeTimeContext
         {
             return source == null ? sender 
