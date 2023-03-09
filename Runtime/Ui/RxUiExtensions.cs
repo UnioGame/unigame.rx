@@ -75,6 +75,14 @@ namespace UniGame.Rx.Runtime.Extensions
             return !source ? view : Bind(view, source, () => command.Execute(Unit.Default), TimeSpan.FromMilliseconds(throttleInMilliseconds));
         }
         
+        public static TView Bind<TView>(this TView view, 
+            IObservable<bool> source, 
+            Image image)
+            where TView : ILifeTimeContext
+        {
+            return !image ? view : view.Bind(source, x => image.enabled = x);
+        }
+        
         public static TView Bind<TView>(this TView view, IObservable<Unit> source, IReactiveCommand<Unit> command)
                     where TView : ILifeTimeContext
         {
