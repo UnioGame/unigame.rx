@@ -44,7 +44,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return source == null ? sender 
                 : sender.Bind(source, () => value.SetValue(true) , throttleTime);
         }
-        
+
         public static TView Bind<TView>(this TView sender, Button source, Action<Unit> command, TimeSpan throttleTime)
             where TView : ILifeTimeContext
         {
