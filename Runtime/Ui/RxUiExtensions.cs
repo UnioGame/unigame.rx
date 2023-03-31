@@ -23,6 +23,13 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender.Bind(source,x => command.onClick?.Invoke());
         }
         
+        public static TView Bind<TView>(this TView sender, IObservable<Color> source, Image image)
+            where TView : ILifeTimeContext
+        {
+            if (image == null) return sender;
+            return sender.Bind(source,x => image.SetValue(x));
+        }
+        
         public static TView Bind<TView>(this TView sender, IObservable<float> source, Slider slider)
             where TView : ILifeTimeContext
         {
