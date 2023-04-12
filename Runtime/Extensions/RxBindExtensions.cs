@@ -5,7 +5,8 @@ namespace UniGame.Rx.Runtime.Extensions
     using Cysharp.Threading.Tasks;
     using UniGame.Core.Runtime;
     using UniRx;
-    
+    using UnityEngine;
+
     public static class RxBindExtensions
     {
         #region lifetime context
@@ -30,6 +31,18 @@ namespace UniGame.Rx.Runtime.Extensions
             return view.Bind(source, x => value.Value = x);
         }
 
+                
+        public static TView Bind<TView>(this TView view, IObservable<bool> source, GameObject asset)
+            where TView : ILifeTimeContext
+        {
+            return !asset ? view : view.Bind(source, asset.SetActive);
+        }
+
+        public static TView BindNot<TView>(this TView view, IObservable<bool> source, GameObject asset)
+            where TView : ILifeTimeContext
+        {
+            return !asset ? view : view.Bind(source,x => asset.SetActive(!x));
+        }
         
         public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext

@@ -75,7 +75,7 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             return !button ? view : view.Bind(source, x => button.interactable = x);
         }
-        
+
         public static TView Bind<TView>(this TView view, Button source, IReactiveCommand<Unit> command, int throttleInMilliseconds = 0)
             where TView : ILifeTimeContext
         {
