@@ -170,6 +170,12 @@ namespace UniGame.Rx.Runtime.Extensions
             return view.Bind(source,x => text.SetValue(x));
         }
         
+        public static TView Bind<TView>(this TView view, IObservable<Color> source, TextMeshProUGUI text)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source,text.SetValue);
+        }
+        
         public static TView Bind<TView>(this TView view, IObservable<int> source, TextMeshProUGUI text)
             where TView : ILifeTimeContext
         {
