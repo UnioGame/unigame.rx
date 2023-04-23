@@ -27,7 +27,7 @@ namespace UniModules.UniGame.CoreModules.UniGame.Core.Runtime.Async
 
             observable.Subscribe(x => OnNext(x,predicate)).AddTo(observableLIfeTime);
             await this.WaitUntil(() => _lifeTime.IsTerminated || _valueInitialized)
-                .AttachExternalCancellation(_lifeTime.TokenSource);
+                .AttachExternalCancellation(_lifeTime.CancellationToken);
             return _value;
         }
 

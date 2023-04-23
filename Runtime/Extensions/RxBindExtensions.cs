@@ -196,7 +196,7 @@ namespace UniGame.Rx.Runtime.Extensions
             Func<T,UniTask<TTaskValue>> asyncAction)
             where TSource : ILifeTimeContext
         {
-            return view.Bind(source, x => asyncAction(x).AttachExternalCancellation(view.LifeTime.TokenSource).Forget());
+            return view.Bind(source, x => asyncAction(x).AttachExternalCancellation(view.LifeTime.CancellationToken).Forget());
         }
         
         public static TSource Bind<TSource,T>(this TSource view,
@@ -205,7 +205,7 @@ namespace UniGame.Rx.Runtime.Extensions
             where TSource : ILifeTimeContext
         {
             return view.Bind(source, x => asyncAction(x)
-                .AttachExternalCancellation(view.LifeTime.TokenSource)
+                .AttachExternalCancellation(view.LifeTime.CancellationToken)
                 .Forget());
         }
 
