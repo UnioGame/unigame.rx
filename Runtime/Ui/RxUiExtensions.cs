@@ -87,7 +87,7 @@ namespace UniGame.Rx.Runtime.Extensions
             Image image)
             where TView : ILifeTimeContext
         {
-            return !image ? view : view.Bind(source, x => image.enabled = x);
+            return image == null ? view : view.Bind(source, x => image.enabled = x);
         }
         
         public static TView Bind<TView>(this TView view, IObservable<Unit> source, IReactiveCommand<Unit> command)
