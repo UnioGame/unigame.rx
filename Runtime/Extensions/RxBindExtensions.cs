@@ -44,6 +44,12 @@ namespace UniGame.Rx.Runtime.Extensions
             return !asset ? view : view.Bind(source,x => asset.SetActive(!x));
         }
         
+        public static TView BindNot<TView>(this TView view, IObservable<bool> source, Action<bool> action)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source.Select(x => !x),action);
+        }
+        
         public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext
         {
