@@ -7,7 +7,7 @@ namespace UniGame.Rx.Runtime.Extensions
     using UniRx;
     using UnityEngine;
 
-    public static class RxBindExtensions
+    public static class ReactiveBindingExtensions
     {
         #region lifetime context
         
@@ -55,13 +55,7 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             return Bind<T,TValue>(sender, source, action, sender.LifeTime);
         }
-        
-        public static T Bind<T, TValue,TResult>(this T sender, IObservable<TValue> source, Func<TValue,TResult> action)
-            where T : ILifeTimeContext
-        {
-            return Bind(sender, source,x => action(x), sender.LifeTime);
-        }
-        
+
         public static T Bind<T, TValue, TFunc>(this T sender, IObservable<TValue> source, Func<TFunc> action)
             where T : ILifeTimeContext
         {
@@ -217,7 +211,6 @@ namespace UniGame.Rx.Runtime.Extensions
 
         #endregion
         
-        
         #region base 
         
         public static TSource BindWhere<TSource,T>(
@@ -272,7 +265,8 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender;
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, 
+        public static T Bind<T, TValue>(this T sender,
+            IObservable<TValue> source, 
             IReactiveCommand<Unit> action,
             ILifeTime lifeTime)
         {
@@ -286,6 +280,5 @@ namespace UniGame.Rx.Runtime.Extensions
         }
 
         #endregion
-        
     }
 }
