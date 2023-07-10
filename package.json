@@ -11,6 +11,7 @@
     "rx"
   ],
   "dependencies": {
+    "com.unigame.dotween": "2023.0.0",
     "com.unigame.neuecc.unirx": "7.1.2",
     "com.unigame.neuecc.unitask": "2.2.5",
     "com.unigame.unicore": "2022.0.0"
