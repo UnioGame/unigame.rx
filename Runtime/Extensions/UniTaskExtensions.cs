@@ -5,6 +5,7 @@ namespace UniGame.Core.Runtime.Extension
     using System;
     using System.Threading;
     using UniCore.Runtime.ProfilerTools;
+    using UniGame.Runtime.ObjectPool;
     using Object = UnityEngine.Object;
 
     public static class UniTaskExtensions
@@ -12,6 +13,20 @@ namespace UniGame.Core.Runtime.Extension
         public static bool IsCompleted(this UniTask task) => task.Status.IsCompleted();
     
         public static bool IsCompleted<T>(this UniTask<T> task) => task.Status.IsCompleted();
+        
+        public static void DespawnNextFrame(this Object data, bool destroy = false)
+        {
+            DespawnNextFrameAsync(data, destroy).Forget();
+            
+            static async UniTask DespawnNextFrameAsync(Object data, bool destroy = false)
+            {
+                await UniTask.Yield(PlayerLoopTiming.LastPreLateUpdate);
+                ObjectPool.Despawn(data,destroy);
+            }
+        }
+                
+        
+
         
         public static async UniTask AwaitTiming(this object source,PlayerLoopTiming loopTiming,int awaitAmount)
         {
