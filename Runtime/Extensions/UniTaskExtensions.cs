@@ -6,6 +6,7 @@ namespace UniGame.Core.Runtime.Extension
     using System.Threading;
     using UniCore.Runtime.ProfilerTools;
     using UniGame.Runtime.ObjectPool;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
     public static class UniTaskExtensions
@@ -21,6 +22,11 @@ namespace UniGame.Core.Runtime.Extension
             static async UniTask DespawnNextFrameAsync(Object data, bool destroy = false)
             {
                 await UniTask.Yield(PlayerLoopTiming.LastPreLateUpdate);
+
+#if UNITY_EDITOR
+                if (Application.isPlaying == false) return;
+#endif
+                
                 ObjectPool.Despawn(data,destroy);
             }
         }
