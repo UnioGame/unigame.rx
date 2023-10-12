@@ -50,6 +50,16 @@ namespace UniGame.Rx.Runtime.Extensions
             return view.Bind(source.Select(x => !x),action);
         }
         
+        public static TSource Bind<TSource,T>(this TSource view,
+            IObservable<T> source, 
+            Func<T,UniTask> asyncAction)
+            where TSource : ILifeTimeContext
+        {
+            return view.Bind(source, x => asyncAction(x)
+                .AttachExternalCancellation(view.LifeTime.CancellationToken)
+                .Forget());
+        }
+        
         public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext
         {
@@ -197,16 +207,6 @@ namespace UniGame.Rx.Runtime.Extensions
             where TSource : ILifeTimeContext
         {
             return view.Bind(source, x => asyncAction(x).AttachExternalCancellation(view.LifeTime.CancellationToken).Forget());
-        }
-        
-        public static TSource Bind<TSource,T>(this TSource view,
-            IObservable<T> source, 
-            Func<T,UniTask> asyncAction)
-            where TSource : ILifeTimeContext
-        {
-            return view.Bind(source, x => asyncAction(x)
-                .AttachExternalCancellation(view.LifeTime.CancellationToken)
-                .Forget());
         }
 
         #endregion
