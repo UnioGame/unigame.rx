@@ -1,9 +1,14 @@
 namespace UniGame.Rx.Runtime.Extensions
 {
     using System;
+    using System.Buffers;
     using System.Collections.Generic;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
     using Cysharp.Threading.Tasks;
     using UniGame.Core.Runtime;
+    using UniGame.Runtime.ObjectPool.Extensions;
+    using UniModules.UniCore.Runtime.ReflectionUtils;
     using UniRx;
     using UnityEngine;
 
@@ -11,18 +16,26 @@ namespace UniGame.Rx.Runtime.Extensions
     {
         #region lifetime context
         
-        public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, IObserver<Unit> observer)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            IObservable<TValue> source, 
+            IObserver<Unit> observer)
             where TView : ILifeTimeContext
         {
             return view.Bind(source,x => observer.OnNext(Unit.Default));
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, IObserver<TValue> observer)
             where TView : ILifeTimeContext
         {
-            return view.Bind(source, observer.OnNext);
+            if (source == null) return view;
+            source.Subscribe(observer)
+                .AddTo(view.LifeTime);
+            return view;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
             IObservable<TValue> source,
             IReactiveProperty<TValue> value)
@@ -30,8 +43,35 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             return view.Bind(source, x => value.Value = x);
         }
-
-                
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            IObservable<TValue> source,
+            MethodInfo value)
+            where TView : ILifeTimeContext
+        {
+            if (value == null || source == null) return view;
+            
+            return view.Bind(source, x =>
+            {
+                var parameters = value.GetParametersInfo();
+                switch (parameters.Length)
+                {
+                    case > 1:
+                        return;
+                    case 0:
+                        value.Invoke(view,Array.Empty<object>());
+                        return;
+                    case 1 when parameters[0].ParameterType == typeof(TValue):
+                        var args = ArrayPool<object>.Shared.Rent(1);
+                        args[0] = x;
+                        value.Invoke(view, args);
+                        args.Despawn();
+                        return;
+                }
+            });
+        }
+        
         public static TView Bind<TView>(this TView view, IObservable<bool> source, GameObject asset)
             where TView : ILifeTimeContext
         {
