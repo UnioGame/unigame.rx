@@ -37,7 +37,7 @@
         {
             //state already active
             if (_isActive)
-                return await UniTaskOperations.AwaitAsync(() => _isActive, () => _value.Value, LifeTime.CancellationToken);
+                return await UniTaskOperations.AwaitAsync(() => _isActive, () => _value.Value, LifeTime.Token);
 
             _isActive = true;
 
@@ -55,7 +55,7 @@
             var contextLifetime = data is ILifeTimeContext lifeTimeContext ? lifeTimeContext.LifeTime.Compose(LifeTime) : LifeTime;
 
             _taskHandle = OnExecute(data, contextLifetime)
-                .AttachExternalCancellation(contextLifetime.CancellationToken)
+                .AttachExternalCancellation(contextLifetime.Token)
                 .Preserve();
 
             var result = await _taskHandle;
@@ -69,15 +69,15 @@
                     break;
                 default:
                     if (this is IAsyncRollback<TData, TResult> valueRollback)
-                        result = await valueRollback.Rollback(data).AttachExternalCancellation(contextLifetime.CancellationToken);
+                        result = await valueRollback.Rollback(data).AttachExternalCancellation(contextLifetime.Token);
                     if (this is IAsyncRollback<TData> rollback)
-                        await rollback.Rollback(data).AttachExternalCancellation(contextLifetime.CancellationToken);
+                        await rollback.Rollback(data).AttachExternalCancellation(contextLifetime.Token);
                     break;
             }
 
             _value.Value = result;
 
-            await Finish(data).AttachExternalCancellation(contextLifetime.CancellationToken);
+            await Finish(data).AttachExternalCancellation(contextLifetime.Token);
 
             return result;
         }

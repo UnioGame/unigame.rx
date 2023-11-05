@@ -12,7 +12,7 @@ public static class LifetimeAsyncExtension
         if (delay > 0)
             return;
 
-        var token = lifeTime.CancellationToken;
+        var token = lifeTime.Token;
         await UniTask.Delay(timeOut,cancellationToken:token)
             .AttachExternalCancellation(token);
 

@@ -53,7 +53,7 @@ namespace UniModules.UniCore.Runtime.Extension
 #endif
             try
             {
-                var result = await value.ToUniTask(true, lifeTime.CancellationToken);
+                var result = await value.ToUniTask(true, lifeTime.Token);
                 return result;
             }
             finally
