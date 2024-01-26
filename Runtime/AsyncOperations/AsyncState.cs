@@ -20,12 +20,12 @@
         private bool                             _isActive;
         private bool                             _isInitialized;
         private TData                            _data;
-        private RecycleReactiveProperty<TResult> _value;
+        private ReactiveValue<TResult> _value;
         private UniTask<TResult>                 _taskHandle;
 
         #region public properties
 
-        public IReadOnlyReactiveProperty<TResult> Value => _value = (_value ?? new RecycleReactiveProperty<TResult>());
+        public IReadOnlyReactiveProperty<TResult> Value => _value = (_value ?? new ReactiveValue<TResult>());
 
         public ILifeTime LifeTime => _lifeTime = (_lifeTime ?? new LifeTimeDefinition());
 
@@ -109,7 +109,7 @@
         {
             _isInitialized =   true;
             _lifeTime      ??= new LifeTimeDefinition();
-            _value         ??= new RecycleReactiveProperty<TResult>();
+            _value         ??= new ReactiveValue<TResult>();
         }
     }
 }

@@ -3,7 +3,7 @@
     using System;
     using UniRx;
 
-    public interface IRecycleReactiveProperty<TValue> : 
+    public interface IReactiveValue<TValue> : 
         IReactiveProperty<TValue>,
         IReadonlyRecycleReactiveProperty<TValue>,
         IValueContainerStatus,

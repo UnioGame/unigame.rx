@@ -21,11 +21,11 @@
         private Exception            _exception;
         private IObservable<TResult> _executionObservable;
         
-        private RecycleReactiveProperty<TResult> _value            = new RecycleReactiveProperty<TResult>(); 
+        private ReactiveValue<TResult> _value            = new ReactiveValue<TResult>(); 
 
         #region public properties
 
-        public IReadOnlyReactiveProperty<TResult> Value => _value = (_value ?? new RecycleReactiveProperty<TResult>());
+        public IReadOnlyReactiveProperty<TResult> Value => _value = (_value ?? new ReactiveValue<TResult>());
 
         public ILifeTime LifeTime => _lifeTime = (_lifeTime ?? new LifeTimeDefinition());
 
@@ -116,7 +116,7 @@
         {
             _isInitialized = true;
             _lifeTime      = (_lifeTime ?? new LifeTimeDefinition());
-            _value         = (_value ?? new RecycleReactiveProperty<TResult>());
+            _value         = (_value ?? new ReactiveValue<TResult>());
         }
     }
 }

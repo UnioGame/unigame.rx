@@ -11,8 +11,8 @@
     using UnityEngine;
 
     [Serializable]
-    public class RecycleReactiveProperty<T> :
-        IRecycleReactiveProperty<T>,
+    public class ReactiveValue<T> :
+        IReactiveValue<T>,
         IUniObserverLinkedList<T>,
         IDespawnable
     {
@@ -38,11 +38,11 @@
 
         #region constructor
 
-        public RecycleReactiveProperty()
+        public ReactiveValue()
         {
         }
 
-        public RecycleReactiveProperty(T value)
+        public ReactiveValue(T value)
         {
             this.value = value;
             hasValue   = true;

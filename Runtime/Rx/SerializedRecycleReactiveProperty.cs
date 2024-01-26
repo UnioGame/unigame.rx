@@ -3,31 +3,31 @@
 namespace UniModules.UniGame.Core.Runtime.Rx
 {
     [Serializable]
-    public class IntRecycleReactiveProperty : RecycleReactiveProperty<int> {}
+    public class IntReactiveValue : ReactiveValue<int> {}
 
     [Serializable]
-    public class FloatRecycleReactiveProperty : RecycleReactiveProperty<float> {}
+    public class FloatReactiveValue : ReactiveValue<float> {}
 
     [Serializable]
-    public class BoolRecycleReactiveProperty : RecycleReactiveProperty<bool>
+    public class BoolReactiveValue : ReactiveValue<bool>
     {
-        public BoolRecycleReactiveProperty() : base()
+        public BoolReactiveValue() : base()
         {
         }
 
-        public BoolRecycleReactiveProperty(bool defaultValue) : base(defaultValue)
+        public BoolReactiveValue(bool defaultValue) : base(defaultValue)
         {
             
         }
     }
     
     [Serializable]
-    public class StringRecycleReactiveProperty : RecycleReactiveProperty<string> {}
+    public class StringReactiveValue : ReactiveValue<string> {}
     
     [Serializable]
-    public class DoubleRecycleReactiveProperty : RecycleReactiveProperty<double> {}
+    public class DoubleReactiveValue : ReactiveValue<double> {}
     
     [Serializable]
-    public class ByteRecycleReactiveProperty : RecycleReactiveProperty<byte> {}
+    public class ByteReactiveValue : ReactiveValue<byte> {}
 }
 

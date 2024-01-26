@@ -103,11 +103,11 @@
             cachedValue = null;
         }
 
-        private IRecycleReactiveProperty<TValue> CreateContextValue<TValue>() => new RecycleReactiveProperty<TValue>();
+        private IReactiveValue<TValue> CreateContextValue<TValue>() => new UniGame.Core.Runtime.Rx.ReactiveValue<TValue>();
 
-        private IRecycleReactiveProperty<TValue> GetData<TValue>()
+        private IReactiveValue<TValue> GetData<TValue>()
         {
-            if (cachedValue is IRecycleReactiveProperty<TValue> data)
+            if (cachedValue is IReactiveValue<TValue> data)
                 return data;
 
             var type = typeof(TValue);
@@ -117,7 +117,7 @@
                 contextValues[type] = value;
             }
             
-            data = value as IRecycleReactiveProperty<TValue>;
+            data = value as IReactiveValue<TValue>;
             cachedType = type;
             cachedValue = data;
             

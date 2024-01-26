@@ -11,7 +11,7 @@
     {
         private bool hasValue = false;
         private bool isValueType = typeof(TData).IsValueType;
-        private RecycleReactiveProperty<TData> _reactiveValue = new RecycleReactiveProperty<TData>();
+        private UniGame.Core.Runtime.Rx.ReactiveValue<TData> _reactiveValue = new UniGame.Core.Runtime.Rx.ReactiveValue<TData>();
 
         public TData Value
         {

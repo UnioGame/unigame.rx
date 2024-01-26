@@ -3,13 +3,13 @@ using UniModules.UniGame.Core.Runtime.Rx;
 using UniRx;
 using UnityEngine;
 
-public class RecycleReactivePropertyTests 
+public class ReactiveValueTests 
 {
     [Test]
     public void ReactivePropertyDisposeTest()
     {
         //info
-        var value = new RecycleReactiveProperty<int>();
+        var value = new ReactiveValue<int>();
             
         //action
         var disposable = value.Subscribe(x => Assert.That(x == int.MaxValue));
@@ -27,7 +27,7 @@ public class RecycleReactivePropertyTests
         var value2     = 0;
         var value3     = 0;
         var finalValue = 555;
-        var value      = new RecycleReactiveProperty<int>();
+        var value      = new ReactiveValue<int>();
             
         //action
         var disposable1 = value.Subscribe(x => value1 = x);
@@ -53,7 +53,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyReceiveTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 100;
         
         //action
@@ -69,7 +69,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyFirstTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 100;
         
         //action
@@ -85,7 +85,7 @@ public class RecycleReactivePropertyTests
     public void UniRxReactiveFirstTwiceAfterTest()
     {
         //info
-        var value       = new RecycleReactiveProperty<int>();
+        var value       = new ReactiveValue<int>();
         var testValue   = 100;
         var resultValue = 0;
         
@@ -107,7 +107,7 @@ public class RecycleReactivePropertyTests
     public void UniRxReactiveFirstTwiceTest()
     {
         //info
-        var value       = new RecycleReactiveProperty<int>();
+        var value       = new ReactiveValue<int>();
         var testValue   = 100;
         var resultValue = 0;
         
@@ -133,7 +133,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyFirstTwicePublishAfterTest()
     {
         //info
-        var value       = new RecycleReactiveProperty<int>();
+        var value       = new ReactiveValue<int>();
         var testValue   = 100;
         var resultValue = 0;
         
@@ -157,7 +157,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyFirstTwiceTest()
     {
         //info
-        var value       = new RecycleReactiveProperty<int>();
+        var value       = new ReactiveValue<int>();
         var testValue   = 100;
         var resultValue = 0;
         
@@ -183,7 +183,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyValueChangeTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 333;
         //action
         var disposable1 = value.Subscribe(x => Assert.That(x == testValue));
@@ -201,7 +201,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyValueChangeDisposeTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 333;
         //action
         var disposable1 = value.Subscribe(x => Assert.That(x == testValue));
@@ -221,7 +221,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertyValueChangeRevertDisposeTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 333;
         //action
         var disposable1 = value.Subscribe(x => Assert.That(x == testValue));
@@ -241,7 +241,7 @@ public class RecycleReactivePropertyTests
     public void ReactivePropertySubscribeAfterTest()
     {
         //info
-        var value     = new RecycleReactiveProperty<int>();
+        var value     = new ReactiveValue<int>();
         var testValue = 333;
         //action
         var disposable1 = value.Subscribe(x => Assert.That(x == testValue));
