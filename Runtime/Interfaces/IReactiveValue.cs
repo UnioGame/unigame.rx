@@ -5,7 +5,7 @@
 
     public interface IReactiveValue<TValue> : 
         IReactiveProperty<TValue>,
-        IReadonlyRecycleReactiveProperty<TValue>,
+        IReadonlyReactiveValue<TValue>,
         IValueContainerStatus,
         IDisposable
 #if UNITY_EDITOR
