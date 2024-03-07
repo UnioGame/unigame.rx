@@ -16,6 +16,7 @@
         IUniObserverLinkedList<T>,
         IDespawnable
     {
+        private bool isValueType = typeof(T).IsValueType;
         private IEqualityComparer<T>        _equalityComparer;
 
         #region inspector
@@ -50,6 +51,8 @@
 
         #endregion
 
+        public bool IsValueType => isValueType;
+        
         IEqualityComparer<T> EqualityComparer => _equalityComparer ??= CreateComparer();
 
         public T Value
