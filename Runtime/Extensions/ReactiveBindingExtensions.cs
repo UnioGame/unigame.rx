@@ -66,7 +66,7 @@ namespace UniGame.Rx.Runtime.Extensions
                         var args = ArrayPool<object>.Shared.Rent(1);
                         args[0] = x;
                         value.Invoke(view, args);
-                        args.Despawn();
+                        ArrayPool<object>.Shared.Return(args);
                         return;
                 }
             });
