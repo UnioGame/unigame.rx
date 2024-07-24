@@ -23,18 +23,21 @@
 
         #region writer methods
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Remove<TData>()
         {           
             var type = typeof(TData);
             return Remove(type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveSilent<TData>()
         {
             var value = GetData<TData>();
             value.RemoveValueSilence();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             Release();
@@ -51,12 +54,14 @@
             return removed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Publish<TData>(TData value)
         {
             var data = GetData<TData>();
             data.Value = value;           
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PublishForce<TData>(TData value)
         {
             var data = GetData<TData>();
@@ -123,6 +128,15 @@
             
             return data;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private object GetData(Type valueType)
+        {
+            var type = valueType;
+            contextValues.TryGetValue(type, out var value);
+            return value;
+        }
+        
 
         //Editor Only API
 #if UNITY_EDITOR
