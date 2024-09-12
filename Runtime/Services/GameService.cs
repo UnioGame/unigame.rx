@@ -12,30 +12,13 @@ namespace UniGame.UniNodes.GameFlow.Runtime
     /// base game service class for binding Context source data to service logic
     /// </summary>
     [Serializable]
-    public abstract class GameService : IGameService, ICompletionSource
+    public abstract class GameService : IGameService
     {
-        private readonly LifeTimeDefinition _lifeTimeDefinition = new LifeTimeDefinition();
+        private readonly LifeTimeDefinition _lifeTimeDefinition = new();
 
-        /// <summary>
-        /// ready by default
-        /// </summary>
-        private readonly BoolReactiveProperty _isReady = new BoolReactiveProperty(false);
-
-        /// <summary>
-        /// complete service awaiter to mark it as ready
-        /// </summary>
-        public void Complete() => _isReady.Value = true;
-
-        /// <summary>
-        /// terminate service lifeTime to release resources
-        /// </summary>
         public void Dispose() => _lifeTimeDefinition.Terminate();
 
-        public bool IsComplete => _isReady.Value;
-
         public ILifeTime LifeTime => _lifeTimeDefinition;
-
-        public IReadOnlyReactiveProperty<bool> IsReady => _isReady;
 
         public virtual UniTask InitializeAsync() { return UniTask.CompletedTask; }
     }
