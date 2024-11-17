@@ -7,9 +7,9 @@
         IReactiveProperty<TValue>,
         IReadonlyReactiveValue<TValue>,
         IValueContainerStatus,
-        IDisposable
+        IDisposable,
+        IReadonlyObjectValue
 #if UNITY_EDITOR
-        ,IReadonlyObjectValue
         ,IObjectValue
 #endif
         

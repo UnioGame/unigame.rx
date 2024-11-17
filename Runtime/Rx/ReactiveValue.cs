@@ -65,6 +65,8 @@
 
         public Type Type => typeof(T);
 
+        public object ObjectValue => value;
+
         #region public methods
 
         public void MakeDespawn()
@@ -153,8 +155,6 @@
             _isDisposed = false;
             CleanUp();
         }
-
-        public object GetValue() => value;
 
         public void SetObjectValue(object nextValue)
         {

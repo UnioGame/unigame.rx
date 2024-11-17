@@ -79,6 +79,13 @@
             var data = GetData<TData>();
             return data == null ? default(TData) : data.Value;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public object Get(Type type)
+        {
+            var data = GetData(type);
+            return data;
+        }
 
         public bool Contains<TData>()
         {
@@ -129,12 +136,25 @@
             return data;
         }
         
+        public object GetValue(Type type)
+        {
+            if (!contextValues.TryGetValue(type, out var value))
+            {
+                return null;
+            }
+            
+            var readonlyValue = value as IReadonlyObjectValue;
+            return readonlyValue?.ObjectValue;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private object GetData(Type valueType)
         {
             var type = valueType;
             contextValues.TryGetValue(type, out var value);
-            return value;
+            
+            var readonlyValue = value as IReadonlyObjectValue;
+            return readonlyValue?.ObjectValue;
         }
         
 
