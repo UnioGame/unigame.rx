@@ -299,7 +299,8 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender;
         }
         
-        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, IObservable<TValue> source, Action<TValue> action)
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
+            IObservable<TValue> source, Action<TValue> action)
         {
             if (action == null) return lifeTime;
             source.Subscribe(action)
@@ -312,6 +313,17 @@ namespace UniGame.Rx.Runtime.Extensions
             if (action == null) return lifeTime;
             source.Subscribe(x => action().AttachExternalCancellation(lifeTime.Token).Forget())
                 .AddTo(lifeTime);
+            return lifeTime;
+        }
+        
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, IObservable<TValue> source, Func<TValue,UniTask> action)
+        {
+            if (action == null) return lifeTime;
+            
+            source.Subscribe(x => action(x)
+                    .AttachExternalCancellation(lifeTime.Token)
+                    .Forget()).AddTo(lifeTime);
+            
             return lifeTime;
         }
         
