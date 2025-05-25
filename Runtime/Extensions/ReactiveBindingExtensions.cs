@@ -283,6 +283,14 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender;
         }
         
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, IObservable<TValue> source, Action<TValue> action)
+        {
+            if (action == null) return lifeTime;
+            source.Subscribe(action)
+                .AddTo(lifeTime);
+            return lifeTime;
+        }
+        
         public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, 
             Action<T,TValue> action,
             ILifeTime lifeTime)
