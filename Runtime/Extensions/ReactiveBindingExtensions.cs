@@ -45,6 +45,14 @@ namespace UniGame.Rx.Runtime.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ILifeTime Bind<TValue>(this ILifeTime source, 
+            IObservable<TValue> observable,
+            IReactiveProperty<TValue> value)
+        {
+            return source.Bind(observable, x => value.Value = x);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
             IObservable<TValue> source,
             MethodInfo value)
@@ -129,6 +137,14 @@ namespace UniGame.Rx.Runtime.Extensions
             where T : ILifeTimeContext
         {
             return action == null ? sender : Bind<T,TValue>(sender, source, x => action(), sender.LifeTime);
+        }
+        
+        public static ILifeTime Bind<TValue>(this ILifeTime sender, 
+            IObservable<TValue> source, Action action)
+        {
+            return action == null 
+                ? sender 
+                : Bind(sender, source, x => action());
         }
         
         public static TResult BindConvert<TResult,T, TValue>(this T sender,Func<T,TResult> converter, IObservable<TValue> source, Action action)
