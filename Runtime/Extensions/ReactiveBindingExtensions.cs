@@ -119,6 +119,13 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             return Bind<T,TValue>(sender, source,x => action(), sender.LifeTime);
         }
+        
+        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Func<UniTask> action)
+            where T : ILifeTimeContext
+        {
+            if(action == null) return sender;
+            return Bind(sender, source,x => action().Forget(), sender.LifeTime);
+        }
 
         public static T Bind<T>(this T sender, IDisposable disposable)
             where T : ILifeTimeContext
