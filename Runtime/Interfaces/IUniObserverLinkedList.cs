@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniGame.Core.Runtime.Rx
+﻿namespace UniGame.Runtime.Rx
 {
     public interface IUniObserverLinkedList<T>
     {

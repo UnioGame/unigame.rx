@@ -1,12 +1,12 @@
 ﻿namespace UniGame.Core.Runtime
 {
-    using UniRx;
+    using R3;
 
     public interface IReactiveStatus
     {
         /// <summary>
         /// is service ready to work
         /// </summary>
-        IReadOnlyReactiveProperty<bool> IsReady { get; }
+        ReadOnlyReactiveProperty<bool> IsReady { get; }
     }
 }

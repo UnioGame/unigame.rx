@@ -1,4 +1,4 @@
-namespace UniGame.Rx.Runtime.Extensions
+namespace UniGame.Runtime.Rx.Runtime.Extensions
 {
     using System;
     using System.Buffers;
@@ -6,10 +6,10 @@ namespace UniGame.Rx.Runtime.Extensions
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Cysharp.Threading.Tasks;
+    using R3;
     using UniGame.Core.Runtime;
-    using UniGame.Runtime.ObjectPool.Extensions;
-    using UniModules.UniCore.Runtime.ReflectionUtils;
-    using UniRx;
+    using UniGame.Runtime.ReflectionUtils;
+    using Rx;
     using UnityEngine;
 
     public static class ReactiveBindingExtensions
@@ -18,7 +18,7 @@ namespace UniGame.Rx.Runtime.Extensions
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
-            IObservable<TValue> source, 
+            Observable<TValue> source, 
             IObserver<Unit> observer)
             where TView : ILifeTimeContext
         {
@@ -26,19 +26,76 @@ namespace UniGame.Rx.Runtime.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, IObserver<TValue> observer)
+        public static TView Bind<TView,TValue>(this TView view, Observable<TValue> source, 
+            Observer<TValue> observer)
             where TView : ILifeTimeContext
         {
             if (source == null) return view;
-            source.Subscribe(observer)
+            source.Subscribe(observer).AddTo(view.LifeTime);
+            return view;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, Observable<TValue> source, 
+            IObserver<TValue> observer)
+            where TView : ILifeTimeContext
+        {
+            if (source == null) return view;
+            source.Subscribe(observer.ToObserver()).AddTo(view.LifeTime);
+            return view;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, Observer<TValue> observer)
+            where TView : ILifeTimeContext
+        {
+            if (source == null) return view;
+            source.ToObservable()
+                .Subscribe(observer)
                 .AddTo(view.LifeTime);
             return view;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, IObservable<TValue> source, IObserver<TValue> observer)
+            where TView : ILifeTimeContext
+        {
+            if (source == null) return view;
+            source.Subscribe(observer).AddTo(view.LifeTime);
+            return view;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            Observable<TValue> source,
+            ReactiveProperty<TValue> value)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source, x => value.Value = x);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            Observable<TValue> source,
+            ISubject<TValue> value)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source,value.OnNext);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
             IObservable<TValue> source,
-            IReactiveProperty<TValue> value)
+            ReactiveProperty<TValue> value)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source.ToObservable(),value);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            Observable<TValue> source,
+            ReactiveValue<TValue> value)
             where TView : ILifeTimeContext
         {
             return view.Bind(source, x => value.Value = x);
@@ -46,15 +103,23 @@ namespace UniGame.Rx.Runtime.Extensions
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ILifeTime Bind<TValue>(this ILifeTime source, 
-            IObservable<TValue> observable,
-            IReactiveProperty<TValue> value)
+            Observable<TValue> observable,
+            ReactiveProperty<TValue> value)
+        {
+            return source.Bind(observable, x => value.Value = x);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ILifeTime Bind<TValue>(this ILifeTime source, 
+            Observable<TValue> observable,
+            ReactiveValue<TValue> value)
         {
             return source.Bind(observable, x => value.Value = x);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
-            IObservable<TValue> source,
+            Observable<TValue> source,
             MethodInfo value)
             where TView : ILifeTimeContext
         {
@@ -80,26 +145,26 @@ namespace UniGame.Rx.Runtime.Extensions
             });
         }
         
-        public static TView Bind<TView>(this TView view, IObservable<bool> source, GameObject asset)
+        public static TView Bind<TView>(this TView view, Observable<bool> source, GameObject asset)
             where TView : ILifeTimeContext
         {
             return !asset ? view : view.Bind(source, asset.SetActive);
         }
 
-        public static TView BindNot<TView>(this TView view, IObservable<bool> source, GameObject asset)
+        public static TView BindNot<TView>(this TView view, Observable<bool> source, GameObject asset)
             where TView : ILifeTimeContext
         {
             return !asset ? view : view.Bind(source,x => asset.SetActive(!x));
         }
         
-        public static TView BindNot<TView>(this TView view, IObservable<bool> source, Action<bool> action)
+        public static TView BindNot<TView>(this TView view, Observable<bool> source, Action<bool> action)
             where TView : ILifeTimeContext
         {
             return view.Bind(source.Select(x => !x),action);
         }
         
         public static TSource Bind<TSource,T>(this TSource view,
-            IObservable<T> source, 
+            Observable<T> source, 
             Func<T,UniTask> asyncAction)
             where TSource : ILifeTimeContext
         {
@@ -108,19 +173,19 @@ namespace UniGame.Rx.Runtime.Extensions
                 .Forget());
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext
         {
             return Bind<T,TValue>(sender, source, action, sender.LifeTime);
         }
 
-        public static T Bind<T, TValue, TFunc>(this T sender, IObservable<TValue> source, Func<TFunc> action)
+        public static T Bind<T, TValue, TFunc>(this T sender, Observable<TValue> source, Func<TFunc> action)
             where T : ILifeTimeContext
         {
             return Bind<T,TValue>(sender, source,x => action(), sender.LifeTime);
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Func<UniTask> action)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Func<UniTask> action)
             where T : ILifeTimeContext
         {
             if(action == null) return sender;
@@ -134,27 +199,27 @@ namespace UniGame.Rx.Runtime.Extensions
             return sender;
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<T,TValue> action)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<T,TValue> action)
             where T : ILifeTimeContext
         {
             return Bind<T,TValue>(sender, source, action, sender.LifeTime);
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action action)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action action)
             where T : ILifeTimeContext
         {
             return action == null ? sender : Bind<T,TValue>(sender, source, x => action(), sender.LifeTime);
         }
         
         public static ILifeTime Bind<TValue>(this ILifeTime sender, 
-            IObservable<TValue> source, Action action)
+            Observable<TValue> source, Action action)
         {
             return action == null 
                 ? sender 
                 : Bind(sender, source, x => action());
         }
         
-        public static TResult BindConvert<TResult,T, TValue>(this T sender,Func<T,TResult> converter, IObservable<TValue> source, Action action)
+        public static TResult BindConvert<TResult,T, TValue>(this T sender,Func<T,TResult> converter, Observable<TValue> source, Action action)
             where T : ILifeTimeContext
         {
             TResult result = default;
@@ -165,7 +230,7 @@ namespace UniGame.Rx.Runtime.Extensions
         
         public static TSource BindWhere<TSource,T>(
             this TSource sender,
-            IObservable<T> source, 
+            Observable<T> source, 
             Func<bool> predicate,
             Action<T> target)
             where TSource : ILifeTimeContext
@@ -193,19 +258,6 @@ namespace UniGame.Rx.Runtime.Extensions
         {
             view.AddDisposable(target);
             return view;
-        }
-        
-                
-        public static TSource BindLateUpdate<TSource>(
-            this TSource view,
-            Func<bool> predicate, 
-            Action target)
-            where TSource : ILifeTimeContext
-        {
-            var observable = Observable.EveryLateUpdate()
-                .Where(x => predicate());
-                
-            return view.Bind(observable,target);
         }
         
         public static TSource BindIntervalUpdate<TSource>(
@@ -248,7 +300,7 @@ namespace UniGame.Rx.Runtime.Extensions
                 
         public static TSource BindIf<TSource,T>(
             this TSource view,
-            IObservable<T> source, 
+            Observable<T> source, 
             Func<bool> predicate,
             Action<T> target)
             where TSource : ILifeTimeContext
@@ -265,7 +317,7 @@ namespace UniGame.Rx.Runtime.Extensions
         
         public static TSource Bind<TSource,T,TTaskValue>(
             this TSource view,
-            IObservable<T> source, 
+            Observable<T> source, 
             Func<T,UniTask<TTaskValue>> asyncAction)
             where TSource : ILifeTimeContext
         {
@@ -278,7 +330,7 @@ namespace UniGame.Rx.Runtime.Extensions
         
         public static TSource BindWhere<TSource,T>(
             this TSource sender,
-            IObservable<T> source, 
+            Observable<T> source, 
             Func<bool> predicate,
             Action<T> target,
             ILifeTime lifeTime)
@@ -298,7 +350,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return view;
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, Action<TValue> action, ILifeTime lifeTime)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<TValue> action, ILifeTime lifeTime)
         {
             if (action == null) return sender;
             source.Subscribe(action)
@@ -307,7 +359,7 @@ namespace UniGame.Rx.Runtime.Extensions
         }
         
         public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
-            IObservable<TValue> source, Action<TValue> action)
+            Observable<TValue> source, Action<TValue> action)
         {
             if (action == null) return lifeTime;
             source.Subscribe(action)
@@ -315,7 +367,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return lifeTime;
         }
         
-        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, IObservable<TValue> source, Func<UniTask> action)
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<UniTask> action)
         {
             if (action == null) return lifeTime;
             source.Subscribe(x => action().AttachExternalCancellation(lifeTime.Token).Forget())
@@ -323,7 +375,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return lifeTime;
         }
         
-        public static ILifeTime Bind<TValue,TTaskValue>(this ILifeTime lifeTime, IObservable<TValue> source, Func<UniTask<TTaskValue>> action)
+        public static ILifeTime Bind<TValue,TTaskValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<UniTask<TTaskValue>> action)
         {
             if (action == null) return lifeTime;
             source.Subscribe(x => action().AttachExternalCancellation(lifeTime.Token).Forget())
@@ -331,7 +383,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return lifeTime;
         }
         
-        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, IObservable<TValue> source, Func<TValue,UniTask> action)
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<TValue,UniTask> action)
         {
             if (action == null) return lifeTime;
             
@@ -342,7 +394,7 @@ namespace UniGame.Rx.Runtime.Extensions
             return lifeTime;
         }
         
-        public static T Bind<T, TValue>(this T sender, IObservable<TValue> source, 
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, 
             Action<T,TValue> action,
             ILifeTime lifeTime)
         {
@@ -352,26 +404,28 @@ namespace UniGame.Rx.Runtime.Extensions
         }
         
         public static T Bind<T, TValue>(this T sender, 
-            IObservable<TValue> source, 
-            IReactiveCommand<TValue> action,
+            Observable<TValue> source, 
+            ReactiveCommand<TValue> action,
             ILifeTime lifeTime)
         {
+            
             if (action == null) return sender;
-            source.Where(x => action.CanExecute.Value)
-                .Subscribe(x => action.Execute(x))
+            
+            source.Where(x => action.CanExecute())
+                .Subscribe(action.Execute)
                 .AddTo(lifeTime);
             
             return sender;
         }
         
         public static T Bind<T, TValue>(this T sender,
-            IObservable<TValue> source, 
-            IReactiveCommand<Unit> action,
+            Observable<TValue> source, 
+            ReactiveCommand<Unit> action,
             ILifeTime lifeTime)
         {
             if (action == null) return sender;
             
-            source.Where(x => action.CanExecute.Value)
+            source.Where(x => action.CanExecute())
                 .Subscribe(x => action.Execute(Unit.Default))
                 .AddTo(lifeTime);
             

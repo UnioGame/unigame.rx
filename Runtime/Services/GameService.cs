@@ -4,9 +4,8 @@ using UniGame.GameFlow.Runtime.Interfaces;
 namespace UniGame.UniNodes.GameFlow.Runtime
 {
     using Cysharp.Threading.Tasks;
-    using UniModules.UniCore.Runtime.DataFlow;
+    using UniGame.Runtime.DataFlow;
     using Core.Runtime;
-    using UniRx;
 
     /// <summary>
     /// base game service class for binding Context source data to service logic

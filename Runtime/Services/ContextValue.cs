@@ -1,11 +1,11 @@
-﻿namespace UniModules.UniCore.Runtime.Common
+﻿namespace UniGame.Runtime.Common
 {
     using System;
     using System.Runtime.CompilerServices;
     using global::UniGame.Runtime.ObjectPool.Extensions;
     using global::UniGame.Core.Runtime.ObjectPool;
     using global::UniGame.Core.Runtime;
-    using UniGame.Core.Runtime.Rx;
+    using global::UniGame.Runtime.Rx;
 
     // [Serializable]
     // public class ReactiveValue<TData> : IDataValue<TData> , IPoolable

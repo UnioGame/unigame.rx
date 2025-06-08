@@ -1,11 +1,11 @@
-﻿namespace UniModules.UniGame.Core.Runtime.AsyncOperations
+﻿using UniGame.Core.Runtime;
+
+namespace UniGame.Rx.Runtime
 {
+    using System;
     using Cysharp.Threading.Tasks;
-    using global::UniGame.Core.Runtime;
-    using Rx;
-    using UniCore.Runtime.AsyncOperations;
-    using UniCore.Runtime.DataFlow;
-    using UniRx;
+    using UniGame.Runtime.DataFlow;
+    using UniGame.Runtime.Rx;
 
     public class AsyncState<TData> :
         AsyncState<TData, AsyncStatus>,
@@ -13,8 +13,7 @@
     {
     }
 
-    public class AsyncState<TData, TResult> :
-        IAsyncState<TData, TResult>
+    public class AsyncState<TData, TResult> : IAsyncState<TData, TResult>
     {
         private LifeTimeDefinition               _lifeTime;
         private bool                             _isActive;
@@ -24,8 +23,6 @@
         private UniTask<TResult>                 _taskHandle;
 
         #region public properties
-
-        public IReadOnlyReactiveProperty<TResult> Value => _value = (_value ?? new ReactiveValue<TResult>());
 
         public ILifeTime LifeTime => _lifeTime = (_lifeTime ?? new LifeTimeDefinition());
 
@@ -37,17 +34,17 @@
         {
             //state already active
             if (_isActive)
-                return await UniTaskOperations.AwaitAsync(() => _isActive, () => _value.Value, LifeTime.Token);
+            {
+                await UniTask.WaitWhile(this, x => x._isActive,cancellationToken:_lifeTime.Token);
+                return _value.Value;
+            }
 
             _isActive = true;
 
-            if (!_isInitialized)
-                Initialize();
+            if (!_isInitialized) Initialize();
 
             _data = data;
 
-            //cleanup value on reset
-            LifeTime.AddCleanUpAction(() => _value.Release());
             //setup default value
             _value.Value = GetInitialExecutionValue();
 
@@ -111,5 +108,13 @@
             _lifeTime      ??= new LifeTimeDefinition();
             _value         ??= new ReactiveValue<TResult>();
         }
+    }
+    
+        
+    [Serializable]
+    public struct StateResult
+    {
+        public bool success;
+        public string error;
     }
 }

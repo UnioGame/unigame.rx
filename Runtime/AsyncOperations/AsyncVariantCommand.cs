@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UniModules.UniGame.Core.Runtime.AsyncOperations
+namespace UniGame.Rx.Runtime
 {
     using System;
     using Common;

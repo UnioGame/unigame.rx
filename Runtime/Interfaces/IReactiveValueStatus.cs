@@ -1,10 +1,10 @@
 namespace UniGame.Core.Runtime
 {
-    using UniRx;
+    using R3;
 
-    public interface IReactiveValueStatus
+    public interface ReactiveValueStatus
     {
-        IReadOnlyReactiveProperty<bool> HasValueSource { get; }
+        ReadOnlyReactiveProperty<bool> HasValueSource { get; }
 
     }
 }

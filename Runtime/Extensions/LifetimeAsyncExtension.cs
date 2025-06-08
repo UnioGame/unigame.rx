@@ -1,40 +1,62 @@
 using System;
 using Cysharp.Threading.Tasks;
-using UniCore.Runtime.ProfilerTools;
+using R3;
 using UniGame.Core.Runtime;
 using UnityEngine;
 
-public static class LifetimeAsyncExtension 
+public static class LifetimeExtension 
 {
-    public static async UniTask AwaitTimeoutLog(this ILifeTime lifeTime,TimeSpan timeOut,Func<string> message,LogType logType = LogType.Error)
+    
+    public static ILifeTime BindEvent(this ILifeTimeContext lifeTimeContext,Action action,Action cancellationAction)
     {
-        var delay = timeOut.TotalMilliseconds;
-        if (delay > 0)
-            return;
-
-        var token = lifeTime.Token;
-        await UniTask.Delay(timeOut,cancellationToken:token)
-            .AttachExternalCancellation(token);
-
-        var logMessage = message();
-        
-        switch (logType)
-        {
-            case LogType.Error:
-            case LogType.Assert:
-            case LogType.Exception:
-                GameLog.LogError(logMessage);
-                break;
-            case LogType.Warning:
-                GameLog.LogWarning(logMessage);
-                break;
-            case LogType.Log:
-                GameLog.Log(logMessage);
-                break;
-        }
-
-        
-        GameLog.Log(message?.Invoke());
+        return lifeTimeContext.LifeTime.BindEvent(action,cancellationAction);
     }
+    
+    public static ILifeTime BindEvent<TArg>(this ILifeTimeContext lifeTimeContext,Action<TArg> action,Action<TArg> cancellationAction)
+    {
+        return lifeTimeContext.LifeTime.BindEvent(action,cancellationAction);
+    }
+    
+    public static ILifeTime BindEvent<TArg,TArg2>(this ILifeTimeContext lifeTimeContext,Action<TArg,TArg2> action,Action<TArg,TArg2> cancellationAction)
+    {
+        return lifeTimeContext.LifeTime.BindEvent(action,cancellationAction);
+    }
+    
+    public static ILifeTime BindEvent<TArg,TArg2>(this ILifeTime lifeTime,Action<TArg,TArg2> source,Action<TArg,TArg2> listener)
+    {
+        if (source == null || listener == null || lifeTime.IsTerminated) return lifeTime;
+        
+        Observable.FromEvent(x => source+=listener,
+                x => source-=listener)
+            .Subscribe()
+            .AddTo(lifeTime);
+        
+        return lifeTime;
+    }
+    
+    public static ILifeTime BindEvent<TArg>(this ILifeTime lifeTime,Action<TArg> source,Action<TArg> listener)
+    {
+        if (source == null || listener == null || lifeTime.IsTerminated) return lifeTime;
+        
+        Observable.FromEvent(x => source+=listener,
+                x => source-=listener)
+            .Subscribe()
+            .AddTo(lifeTime);
+        
+        return lifeTime;
+    }
+    
+    public static ILifeTime BindEvent(this ILifeTime lifeTime,Action source,Action listener)
+    {
+        if (source == null || listener == null || lifeTime.IsTerminated) return lifeTime;
+        
+        Observable.FromEvent(x => source+=listener,
+                x => source-=listener)
+            .Subscribe()
+            .AddTo(lifeTime);
+        
+        return lifeTime;
+    }
+
 
 }

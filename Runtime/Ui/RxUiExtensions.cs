@@ -1,4 +1,4 @@
-namespace UniGame.Rx.Runtime.Extensions
+namespace UniGame.Runtime.Rx.Runtime.Extensions
 {
     using Extensions;
     using UnityEngine;
@@ -7,9 +7,9 @@ namespace UniGame.Rx.Runtime.Extensions
     using TMPro;
     using UniGame.Core.Runtime;
     using UniGame.Runtime.Common;
-    using UniModules.UniCore.Runtime.Utils;
+    using UniGame.Runtime.Utils;
     using UniModules.UniUiSystem.Runtime.Utils;
-    using UniRx;
+     
     
     public static class RxUiExtensions
     {

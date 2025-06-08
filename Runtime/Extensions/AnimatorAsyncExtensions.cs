@@ -1,4 +1,4 @@
-﻿namespace UniGame.Rx.Runtime.Extensions
+﻿namespace UniGame.Runtime.Rx.Runtime.Extensions
 {
     using System;
     using Cysharp.Threading.Tasks;

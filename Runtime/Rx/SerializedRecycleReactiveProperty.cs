@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UniModules.UniGame.Core.Runtime.Rx
+namespace UniGame.Runtime.Rx
 {
     [Serializable]
     public class IntReactiveValue : ReactiveValue<int> {}

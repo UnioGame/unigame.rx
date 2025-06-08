@@ -1,7 +1,7 @@
 ﻿namespace UniGame.Core.Runtime
 {
-    using System;
-    using UniRx;
+    using UniGame.Runtime.Rx;
+
 
     public interface IReadOnlyContext :
         ILifeTimeContext,
@@ -19,13 +19,6 @@
         IMessageContext,
         IManagedBroadcaster<IMessagePublisher>,
         ITypeData
-    {
-        
-    }
-
-    public interface IDisposableContext : 
-        IContext, 
-        IDisposable
     {
         
     }

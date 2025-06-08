@@ -2,12 +2,12 @@ namespace UniGame.Core.Runtime
 {
     using System;
     using Cysharp.Threading.Tasks;
-    using UniRx;
+    using R3;
 
     public interface IAsyncController : IDisposable
     {
         
-        IReadOnlyReactiveProperty<bool> IsInitialized { get; }
+        ReadOnlyReactiveProperty<bool> IsInitialized { get; }
 
         ILifeTime LifeTime { get; }
 

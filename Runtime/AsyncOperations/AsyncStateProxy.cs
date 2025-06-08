@@ -1,6 +1,6 @@
 ﻿namespace UniModules.UniGame.Context.SerializableContext.Runtime.States {
     using System;
-    using Core.Runtime.AsyncOperations;
+    using global::UniGame.Rx.Runtime;
     using global::UniGame.Core.Runtime;
     using Cysharp.Threading.Tasks;
 

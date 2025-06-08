@@ -1,6 +1,7 @@
 ﻿namespace UniGame.Core.Runtime
 {
-    using UniRx;
+    using UniGame.Runtime.Rx;
+
 
     public interface IWritableValue
     {

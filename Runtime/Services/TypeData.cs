@@ -1,12 +1,12 @@
-﻿namespace UniModules.UniCore.Runtime.Common
+﻿namespace UniGame.Runtime.Common
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using global::UniGame.Core.Runtime;
-    using global::UniGame.Core.Runtime.Rx;
-    using UniGame.Core.Runtime.Rx;
+    using global::UniGame.Runtime.Rx;
+    using R3;
 
     [Serializable]
     public class TypeData : ITypeData
@@ -17,7 +17,7 @@
         /// <summary>
         /// registered components
         /// </summary>
-        private Dictionary<Type, IValueContainerStatus> contextValues = new Dictionary<Type, IValueContainerStatus>(32);
+        private Dictionary<Type, IValueContainerStatus> contextValues = new(32);
 
         public bool HasValue => contextValues.Any(value => value.Value.HasValue);
 
@@ -28,13 +28,6 @@
         {           
             var type = typeof(TData);
             return Remove(type);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveSilent<TData>()
-        {
-            var value = GetData<TData>();
-            value.RemoveValueSilence();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,7 +64,7 @@
         #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IObservable<TData> Receive<TData>() =>  GetData<TData>();
+        public Observable<TData> Receive<TData>() =>  GetData<TData>();
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TData Get<TData>()
@@ -115,11 +108,11 @@
             cachedValue = null;
         }
 
-        private IReactiveValue<TValue> CreateContextValue<TValue>() => new UniGame.Core.Runtime.Rx.ReactiveValue<TValue>();
+        private ReactiveValue<TValue> CreateContextValue<TValue>() => new();
 
-        private IReactiveValue<TValue> GetData<TValue>()
+        private ReactiveValue<TValue> GetData<TValue>()
         {
-            if (cachedValue is IReactiveValue<TValue> data)
+            if (cachedValue is ReactiveValue<TValue> data)
                 return data;
 
             var type = typeof(TValue);
@@ -129,7 +122,7 @@
                 contextValues[type] = value;
             }
             
-            data = value as IReactiveValue<TValue>;
+            data = value as ReactiveValue<TValue>;
             cachedType = type;
             cachedValue = data;
             

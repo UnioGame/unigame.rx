@@ -1,13 +1,15 @@
 ﻿using System;
 
-namespace UniModules.UniGame.Rx.Runtime.Operations
+namespace UniGame.Runtime.Rx.Runtime.Operations
 {
+    using R3;
+
     public abstract class OperatorObserverBase<TSource, TResult> : IDisposable, IObserver<TSource>
     {
-        protected internal volatile IObserver<TResult> observer;
+        protected internal volatile Observer<TResult> observer;
         IDisposable cancel;
 
-        public OperatorObserverBase(IObserver<TResult> observer, IDisposable cancel)
+        public OperatorObserverBase(Observer<TResult> observer, IDisposable cancel)
         {
             this.observer = observer;
             this.cancel = cancel;
@@ -21,12 +23,9 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
 
         public void Dispose()
         {
-            observer = UniRx.InternalUtil.EmptyObserver<TResult>.Instance;
+            observer = null;
             var target = System.Threading.Interlocked.Exchange(ref cancel, null);
-            if (target != null)
-            {
-                target.Dispose();
-            }
+            target?.Dispose();
         }
     }
 }

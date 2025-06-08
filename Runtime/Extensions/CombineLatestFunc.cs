@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniGame.Core.Runtime.Rx.Extensions
+﻿namespace UniGame.Runtime.Rx.Extensions
 {
 
 }

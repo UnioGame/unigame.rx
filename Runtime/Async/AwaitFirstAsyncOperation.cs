@@ -1,17 +1,18 @@
 using System;
 using Cysharp.Threading.Tasks;
-using UniModules.UniCore.Runtime.DataFlow;
-using UniModules.UniCore.Runtime.Extension;
+using UniGame.Runtime.DataFlow;
+using UniGame.Runtime.Extension;
 using UniGame.Runtime.ObjectPool.Extensions;
 using UniGame.Core.Runtime.ObjectPool;
 using UniGame.Core.Runtime;
-using UniRx;
 
 namespace UniModules.UniGame.CoreModules.UniGame.Core.Runtime.Async
 {
+    using R3;
+
     public class AwaitFirstAsyncOperation<TData> : IPoolable, IDisposable
     {
-        private LifeTimeDefinition _lifeTime = new LifeTimeDefinition();
+        private LifeTimeDefinition _lifeTime = new ();
         private bool _valueInitialized = false;
         private TData _value;
     
@@ -25,9 +26,13 @@ namespace UniModules.UniGame.CoreModules.UniGame.Core.Runtime.Async
             if (observable == null) 
                 return default;
 
-            observable.Subscribe(x => OnNext(x,predicate)).AddTo(observableLIfeTime);
+            observable.ToObservable()
+                .Subscribe(x => OnNext(x,predicate))
+                .AddTo(observableLIfeTime);
+            
             await this.WaitUntil(() => _lifeTime.IsTerminated || _valueInitialized)
                 .AttachExternalCancellation(_lifeTime.Token);
+            
             return _value;
         }
 

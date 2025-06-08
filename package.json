@@ -2,22 +2,23 @@
   "name": "com.unigame.rx",
   "author": "UniGame",
   "displayName": "UniGame Rx Extensions",
-  "description": "Rx Extensions",
-  "homepage": "https://github.com/UniGameTeam/UniGame.Rx#README",
-  "unity": "2019.2",
-  "version": "2022.0.0",
+  "description": "Rx Extensions and Tools on R3 and ReactiveCollections",
+  "homepage": "https://github.com/UnioGame/unigame.rx#README",
+  "unity": "2023.2",
+  "version": "2025.0.0",
   "keywords": [
-    "dotween",
-    "rx"
+    "r3",
+    "rx",
+    "reactive"
   ],
   "dependencies": {
-    "com.unigame.dotween": "2023.0.0",
-    "com.unigame.neuecc.unirx": "7.1.2",
-    "com.unigame.neuecc.unitask": "2.2.5",
-    "com.unigame.unicore": "2022.0.0"
+    "com.cysharp.unitask" : "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.unigame.unicore": "https://github.com/UnioGame/unigame.core.git",
+    "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/UniGameTeam/UniGame.DoTweenRx"
+    "url": "https://github.com/UnioGame/unigame.rx"
   }
 }

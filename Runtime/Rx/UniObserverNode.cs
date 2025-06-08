@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniGame.Core.Runtime.Rx
+﻿namespace UniGame.Runtime.Rx
 {
     using System;
     using System.Threading;

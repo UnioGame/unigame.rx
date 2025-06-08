@@ -1,10 +1,11 @@
 ﻿using System;
-using UniRx;
 
 // implements note : all field must be readonly.
-namespace UniModules.UniGame.Rx.Runtime.Operations
+namespace UniGame.Runtime.Rx.Runtime.Operations
 {
-    public abstract class OperatorObservableBase<T> : IObservable<T>, IOptimizedObservable<T>
+    using R3;
+
+    public abstract class OperatorObservableBase<T> : IObservable<T>
     {
         readonly bool isRequiredSubscribeOnCurrentThread;
 
@@ -17,8 +18,13 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
         {
             return isRequiredSubscribeOnCurrentThread;
         }
-
+        
         public IDisposable Subscribe(IObserver<T> observer)
+        {
+            return Subscribe(observer.ToObserver());
+        }
+        
+        public IDisposable Subscribe(Observer<T> observer)
         {
             var subscription = new SingleAssignmentDisposable();
 
@@ -26,18 +32,12 @@ namespace UniModules.UniGame.Rx.Runtime.Operations
             // does not make the safe observer, it breaks exception durability.
             // var safeObserver = Observer.CreateAutoDetachObserver<T>(observer, subscription);
 
-            if (isRequiredSubscribeOnCurrentThread && Scheduler.IsCurrentThreadSchedulerScheduleRequired)
-            {
-                Scheduler.CurrentThread.Schedule(() => subscription.Disposable = SubscribeCore(observer, subscription));
-            }
-            else
-            {
-                subscription.Disposable = SubscribeCore(observer, subscription);
-            }
+            subscription.Disposable = SubscribeCore(observer, subscription);
 
             return subscription;
         }
 
-        protected abstract IDisposable SubscribeCore(IObserver<T> observer, IDisposable cancel);
+        protected abstract IDisposable SubscribeCore(Observer<T> observer, IDisposable cancel);
+
     }
 }

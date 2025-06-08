@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniCore.Runtime.AsyncOperations
+﻿namespace UniGame.Runtime.AsyncOperations
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@
     using Cysharp.Threading.Tasks;
     using global::UniGame.Runtime.ObjectPool;
     using global::UniGame.Runtime.ObjectPool.Extensions;
-    using UniRx;
+    using R3;
     using UnityEngine;
 
 
@@ -21,24 +21,7 @@
                 return await await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
             }
         }
-
-
-        public static IEnumerator WaitAll(this List<IEnumerator> operations) {
-            var counter = ClassPool.Spawn<List<int>>();
-            counter.Add(0);
-
-            for (var i = 0; i < operations.Count; i++) {
-                var index = i;
-                Observable.FromCoroutine(x => operations[index]).DoOnCompleted(() => counter[0]++).Subscribe();
-            }
-
-            while (counter[0] < operations.Count) {
-                yield return null;
-            }
-
-            counter.DespawnCollection<List<int>,int>();
-        }
-
+        
         public static IEnumerator AwaitAsUniTask<T>(this Task<T> task)
         {
             yield return task.AsUniTask().ToCoroutine();

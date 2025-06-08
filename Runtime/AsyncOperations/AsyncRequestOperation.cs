@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniCore.Runtime.AsyncOperations
+﻿namespace UniGame.Runtime.AsyncOperations
 {
     using System.Collections;
     using global::UniGame.Core.Runtime;

@@ -1,10 +1,11 @@
 ﻿namespace UniGame.Utils.Runtime
 {
     using System;
-    using UniRx;
+    using R3;
     using UnityEngine;
     using UnityEngine.Serialization;
 
+    [Serializable]
     public class AnimatorStateTrigger : StateMachineBehaviour
     {
         [FormerlySerializedAs("_stateName")]
@@ -14,15 +15,15 @@
         /// <summary>
         /// Parameter - animatorStateInfo.fullPathHash
         /// </summary>
-        public IObservable<string> ObserveStateEnter => _observeStateEnter;
+        public Observable<string> ObserveStateEnter => _observeStateEnter;
 
         /// <summary>
         /// Parameter - animatorStateInfo.fullPathHash
         /// </summary>
-        public IObservable<string> ObserveStateExit => _observeStateExit;
+        public Observable<string> ObserveStateExit => _observeStateExit;
 
-        private Subject<string> _observeStateEnter = new Subject<string>();
-        private Subject<string> _observeStateExit  = new Subject<string>();
+        private Subject<string> _observeStateEnter = new();
+        private Subject<string> _observeStateExit  = new();
 
         public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {

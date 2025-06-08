@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using UniGame.Core.Runtime;
 
-namespace UniModules.UniCore.Runtime.Extension
+namespace UniGame.Runtime.Extension
 {
     using System;
     using Cysharp.Threading.Tasks;

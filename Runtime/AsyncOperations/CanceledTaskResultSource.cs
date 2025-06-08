@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniCore.Runtime.AsyncOperations {
+﻿namespace UniGame.Runtime.AsyncOperations {
     using System;
     using System.Threading;
     using Cysharp.Threading.Tasks;
