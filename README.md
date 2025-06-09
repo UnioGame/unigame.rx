@@ -21,10 +21,12 @@ follow the instructions on home pages for these packages:
 
 ```
 
-"dependencies": {
+  "dependencies": {
+    "com.cysharp.unitask" : "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.unigame.unicore": "https://github.com/UnioGame/unigame.core.git",
     "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
-}
+  },
 
 ```
 

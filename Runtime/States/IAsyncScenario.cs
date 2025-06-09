@@ -1,5 +1,5 @@
-﻿namespace UniModules.UniGame.Context.SerializableContext.Runtime.Scenarios {
-    using Abstract;
+﻿namespace UniGame.Context.Runtime.Runtime.Scenarios {
+    using Context.Runtime;
     using global::UniGame.Core.Runtime;
 
     public interface IAsyncScenario : IAsyncContextState<AsyncStatus>
