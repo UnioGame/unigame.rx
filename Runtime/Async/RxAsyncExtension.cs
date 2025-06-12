@@ -5,12 +5,54 @@ namespace UniGame.Runtime.Extension
 {
     using System;
     using Cysharp.Threading.Tasks;
-    using global::UniGame.Core.Runtime;
+    using R3;
+    using Rx;
     using UnityEngine;
 
-    public static class AsyncExtension
+    public static class RxAsyncExtension
     {
         public static float DefaultTimeOutMs = 60000;
+        
+        public static async UniTask<T> FirstAsync<T>(this ReactiveValue<T> value, ILifeTimeContext lifeTime)
+        {
+            return await FirstAsync(value, lifeTime.LifeTime);
+        }
+
+        public static async UniTask<T> FirstAsync<T>(this ReactiveValue<T> value,ILifeTime lifeTime)
+        {
+            return await value
+                .Where(value,(x,y) => y.HasValue)
+                .FirstAsync(lifeTime.Token)
+                .AsUniTask();
+        }
+        
+                
+        public static async UniTask FirstAsync<T>(this ReactiveProperty<T> value, ILifeTimeContext lifeTime) 
+            where T : class
+        {
+            await FirstAsync(value, lifeTime.LifeTime);
+        }
+        
+        public static async UniTask<T> AwaitFirstAsync<T>(this ReactiveValue<T> value,ILifeTime lifeTime)
+        {
+            return await FirstAsync(value,lifeTime);
+        }
+        
+        public static async UniTask<T> FirstAsync<T>(this ReactiveProperty<T> value,ILifeTime lifeTime)
+            where T : class
+        {
+            return await value
+                .Where(value,(x,y) => y.CurrentValue!=null)
+                .FirstAsync(lifeTime.Token)
+                .AsUniTask();
+        }
+
+        
+        public static async UniTask<T> AwaitFirstAsync<T>(this ReactiveProperty<T> value,ILifeTime lifeTime)
+            where T : class
+        {
+            return await FirstAsync(value,lifeTime);
+        }
         
         public static async UniTask WaitUntil(this object source, Func<bool> waitFunc,PlayerLoopTiming timing = PlayerLoopTiming.Update)
         {
@@ -41,7 +83,8 @@ namespace UniGame.Runtime.Extension
             return await AwaitFirstAsync(value, lifeTime).SuppressCancellationThrow();
         }
 
-        public static async UniTask<TValue> AwaitFirstAsync<TValue>(this IObservable<TValue> value, ILifeTime lifeTime)
+        public static async UniTask<TValue> AwaitFirstAsync<TValue>(this IObservable<TValue> value, 
+            ILifeTime lifeTime)
         {
             CancellationTokenSource tokenSource = null;
             

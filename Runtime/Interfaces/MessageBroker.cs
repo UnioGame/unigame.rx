@@ -6,7 +6,7 @@
 
     public class MessageBroker : IMessageBroker
     {
-        public static readonly MessageBroker Default = new MessageBroker();
+        public static readonly MessageBroker Default = new();
         
         public Dictionary<Type,object> _subjects = new();
         
@@ -35,6 +35,11 @@
             }
 
             return value as Observable<T>;
+        }
+
+        public void Dispose()
+        {
+       
         }
     }
 }

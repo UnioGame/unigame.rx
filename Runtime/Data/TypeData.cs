@@ -58,7 +58,7 @@
         public void PublishForce<TData>(TData value)
         {
             var data = GetData<TData>();
-            data.SetValueForce(value);        
+            data.OnNext(value);        
         }
 
         #endregion

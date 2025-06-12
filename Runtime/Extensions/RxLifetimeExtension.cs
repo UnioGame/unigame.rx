@@ -4,8 +4,14 @@ using R3;
 using UniGame.Core.Runtime;
 using UnityEngine;
 
-public static class LifetimeExtension 
+public static class RxLifetimeExtension 
 {
+    public static Subject<T> AddTo<T>(this Subject<T> source, ILifeTime lifeTime) 
+    {
+        if (source == null || lifeTime == null || lifeTime.IsTerminated) return source;
+        lifeTime.AddDispose(source);
+        return source;
+    }
     
     public static ILifeTime BindEvent(this ILifeTimeContext lifeTimeContext,Action action,Action cancellationAction)
     {

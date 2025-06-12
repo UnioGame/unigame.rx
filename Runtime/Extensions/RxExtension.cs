@@ -3,6 +3,9 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Core.Runtime;
+    using Cysharp.Threading.Tasks;
     using global::UniGame.Runtime.ObjectPool;
     using Rx;
     using global::UniGame.Runtime.Rx;
@@ -11,6 +14,7 @@
 
     public static class RxExtension
     {
+        
         public static void Execute(this ReactiveCommand command)
         {
             command.Execute(Unit.Default);
@@ -19,6 +23,11 @@
         public static void Execute(this ReactiveCommand<Unit> command)
         {
             command.Execute(Unit.Default);
+        }
+        
+        public static IDisposable Subscribe(this Observable<Unit> observable,Action action)
+        {
+            return observable.Subscribe(action,(x,y) => y());
         }
         
         public static IRecycleObserver<T> CreateRecycleObserver<T>(this object _, 
@@ -38,7 +47,7 @@
         public static Observable<T> When<T>(this Observable<T> source, Predicate<T> predicate, Action<T> action)
         {
             return source
-                .Where(x => predicate(x))
+                .Where(predicate,(x,y) => y(x))
                 .Do(x => action?.Invoke(x));
         }
 

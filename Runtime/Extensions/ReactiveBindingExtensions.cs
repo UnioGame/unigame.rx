@@ -8,7 +8,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
     using Cysharp.Threading.Tasks;
     using R3;
     using UniGame.Core.Runtime;
-    using UniGame.Runtime.ReflectionUtils;
+    using ReflectionUtils;
     using Rx;
     using UnityEngine;
 
@@ -116,7 +116,18 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         {
             return source.Bind(observable, x => value.Value = x);
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView, TValue>(this TView view,
+            ReactiveValue<TValue> source,
+            MethodInfo value)
+            where TView : ILifeTimeContext
+        {
+            return Bind<TView, TValue>(view,
+                source.Where(source, static (x, y) => y.HasValue),
+                value);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TView Bind<TView,TValue>(this TView view, 
             Observable<TValue> source,
@@ -143,6 +154,13 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                         return;
                 }
             });
+        }
+        
+        public static TView Bind<TView>(this TView view, ReactiveValue<bool> source, GameObject asset)
+            where TView : ILifeTimeContext
+        {
+            return !asset ? view : view
+                .Bind(source.Where(source,static (x,y) => y.HasValue), asset.SetActive);
         }
         
         public static TView Bind<TView>(this TView view, Observable<bool> source, GameObject asset)
@@ -173,16 +191,51 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                 .Forget());
         }
         
+        public static TSource Bind<TSource,T>(this TSource view,
+            ReactiveValue<T> source, 
+            Func<T,UniTask> asyncAction)
+            where TSource : ILifeTimeContext
+        {
+            return view.Bind(source.Where(source,static (x,y) => y.HasValue), 
+                x => asyncAction(x)
+                .AttachExternalCancellation(view.LifeTime.Token)
+                .Forget());
+        }
+        
+        public static T Bind<T, TValue>(this T sender, ReactiveValue<TValue> source, Action<TValue> action)
+            where T : ILifeTimeContext
+        {
+            return Bind<T,TValue>(sender, 
+                source.Where(source,static (x,y) => y.HasValue), 
+                action, sender.LifeTime);
+        }
+        
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext
         {
             return Bind<T,TValue>(sender, source, action, sender.LifeTime);
+        }
+        
+        public static T Bind<T, TValue, TFunc>(this T sender, ReactiveValue<TValue> source, Func<TFunc> action)
+            where T : ILifeTimeContext
+        {
+            return Bind(sender, 
+                source.Where(source,static (x,y) => y.HasValue),
+                action);
         }
 
         public static T Bind<T, TValue, TFunc>(this T sender, Observable<TValue> source, Func<TFunc> action)
             where T : ILifeTimeContext
         {
             return Bind<T,TValue>(sender, source,x => action(), sender.LifeTime);
+        }
+        
+        public static T Bind<T, TValue>(this T sender, ReactiveValue<TValue> source, Func<UniTask> action)
+            where T : ILifeTimeContext
+        {
+            return Bind(sender, 
+                source.Where(source,static (x,y) => y.HasValue),
+                action);
         }
         
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Func<UniTask> action)
@@ -239,8 +292,6 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                 sender.Bind(source, target);
             return sender;
         }
-        
-
         
         public static TSource BindCleanUp<TSource>(
             this TSource view, 
@@ -313,7 +364,16 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         
         #endregion
 
-        #region async
+        #region base 
+        
+        public static TSource Bind<TSource,T,TTaskValue>(
+            this TSource view,
+            ReactiveValue<T> source, 
+            Func<T,UniTask<TTaskValue>> asyncAction)
+            where TSource : ILifeTimeContext
+        {
+            return Bind(view,source.Where(source,static (x,y) => y.HasValue),asyncAction);
+        }
         
         public static TSource Bind<TSource,T,TTaskValue>(
             this TSource view,
@@ -323,10 +383,6 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         {
             return view.Bind(source, x => asyncAction(x).AttachExternalCancellation(view.LifeTime.Token).Forget());
         }
-
-        #endregion
-        
-        #region base 
         
         public static TSource BindWhere<TSource,T>(
             this TSource sender,
@@ -340,7 +396,9 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             return sender;
         }
 
-        public static TSource Bind<TSource,TValue>(this TSource view, IEnumerable<TValue> source, Action<TValue> action)
+        public static TSource Bind<TSource,TValue>(this TSource view, 
+            IEnumerable<TValue> source,
+            Action<TValue> action)
         {
             if (source == null || action == null) return view;
 
@@ -350,48 +408,97 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             return view;
         }
         
-        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<TValue> action, ILifeTime lifeTime)
+        public static T Bind<T, TValue>(this T sender, Observable<TValue> source, 
+            Action<TValue> action, ILifeTime lifeTime)
         {
             if (action == null) return sender;
-            source.Subscribe(action)
-                .AddTo(lifeTime);
+            source.Subscribe(action).AddTo(lifeTime);
             return sender;
         }
         
         public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
-            Observable<TValue> source, Action<TValue> action)
+            ReactiveValue<TValue> source, Action<TValue> action)
+        {
+            return Bind(lifeTime, 
+                source.Where(source,static (x,y) => y.HasValue) , action);
+        }
+        
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
+            Observable<TValue> source, 
+            Action<TValue> action)
         {
             if (action == null) return lifeTime;
-            source.Subscribe(action)
-                .AddTo(lifeTime);
+            source.Subscribe(action).AddTo(lifeTime);
             return lifeTime;
         }
         
-        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<UniTask> action)
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
+            Observable<TValue> source, 
+            Func<UniTask> action)
         {
             if (action == null) return lifeTime;
-            source.Subscribe(x => action().AttachExternalCancellation(lifeTime.Token).Forget())
+            source.Subscribe(action,(x,y) => 
+                    y().AttachExternalCancellation(lifeTime.Token).Forget())
                 .AddTo(lifeTime);
             return lifeTime;
         }
-        
-        public static ILifeTime Bind<TValue,TTaskValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<UniTask<TTaskValue>> action)
+
+        public static ILifeTime Bind<TValue, TTaskValue>(this ILifeTime lifeTime,
+            ReactiveValue<TValue> source,
+            Func<UniTask<TTaskValue>> action)
         {
-            if (action == null) return lifeTime;
-            source.Subscribe(x => action().AttachExternalCancellation(lifeTime.Token).Forget())
-                .AddTo(lifeTime);
-            return lifeTime;
+            return Bind(lifeTime, source
+                .Where(source,static (x,y)=>y.HasValue), action);
         }
-        
-        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, Observable<TValue> source, Func<TValue,UniTask> action)
+
+        public static ILifeTime Bind<TValue,TTaskValue>(this ILifeTime lifeTime, 
+            Observable<TValue> source, 
+            Func<UniTask<TTaskValue>> action)
         {
             if (action == null) return lifeTime;
             
-            source.Subscribe(x => action(x)
+            var token = lifeTime.Token;
+            
+            source.Subscribe(action,(x,y) 
+                    => y().AttachExternalCancellation(token).Forget())
+                .AddTo(lifeTime);
+            return lifeTime;
+        }
+
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime,
+            ReactiveValue<TValue> source,
+            Func<TValue, UniTask> action)
+        {
+            return Bind(lifeTime, 
+                source.Where(source,static (x,y) => y.HasValue),
+                action);
+        }
+
+        public static ILifeTime Bind<TValue>(this ILifeTime lifeTime, 
+            Observable<TValue> source, 
+            Func<TValue,UniTask> action)
+        {
+            if (action == null) return lifeTime;
+            
+            source.Subscribe(action,(x,y) => y(x)
                     .AttachExternalCancellation(lifeTime.Token)
                     .Forget()).AddTo(lifeTime);
             
             return lifeTime;
+        }
+        
+        public static T Bind<T, TValue>(this T sender, 
+            ReactiveValue<TValue> source, 
+            Action<T,TValue> action,
+            ILifeTime lifeTime)
+        {
+            if (action == null) return sender;
+            
+            source.Where(source, static (x,y) => y.HasValue)
+                .Subscribe(action,(x,y) => y(sender,x))
+                .AddTo(lifeTime);
+            
+            return sender;
         }
         
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, 
@@ -399,7 +506,8 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             ILifeTime lifeTime)
         {
             if (action == null) return sender;
-            source.Subscribe(x => action(sender,x)).AddTo(lifeTime);
+            source.Subscribe(action,(x,y) => y(sender,x))
+                .AddTo(lifeTime);
             return sender;
         }
         
@@ -408,11 +516,10 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             ReactiveCommand<TValue> action,
             ILifeTime lifeTime)
         {
-            
             if (action == null) return sender;
             
-            source.Where(x => action.CanExecute())
-                .Subscribe(action.Execute)
+            source.Where(action,static (x,y) => y.CanExecute())
+                .Subscribe(action,static (x,y) => y.Execute(x))
                 .AddTo(lifeTime);
             
             return sender;
@@ -425,8 +532,8 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         {
             if (action == null) return sender;
             
-            source.Where(x => action.CanExecute())
-                .Subscribe(x => action.Execute(Unit.Default))
+            source.Where(action,static (x,y) => y.CanExecute())
+                .Subscribe(action,static (x,y) => y.Execute(Unit.Default))
                 .AddTo(lifeTime);
             
             return sender;
