@@ -1,16 +1,10 @@
-﻿namespace UniGame.Runtime.Rx.Extensions
+﻿using UniGame.Runtime.ObjectPool;
+
+namespace UniGame.Runtime.Rx.Extensions
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Core.Runtime;
-    using Cysharp.Threading.Tasks;
-    using global::UniGame.Runtime.ObjectPool;
     using Rx;
-    using global::UniGame.Runtime.Rx;
     using R3;
-
 
     public static class RxExtension
     {
@@ -23,6 +17,11 @@
         public static void Execute(this ReactiveCommand<Unit> command)
         {
             command.Execute(Unit.Default);
+        }
+        
+        public static IDisposable Subscribe<T>(this ReactiveValue<T> observable,Action action)
+        {
+            return observable.Subscribe(action,(x,y) => y());
         }
         
         public static IDisposable Subscribe(this Observable<Unit> observable,Action action)
@@ -56,17 +55,15 @@
             Action<T> actionIfTrue, 
             Action<T> actionIfFalse)
         {
-            return source
-                .Where(x => predicate(x))
-                .Do(x =>
+            return source.Do((predicate,actionIfTrue,actionIfFalse),static (x,y) =>
                 {
-                    if (predicate(x))
+                    if (y.predicate(x))
                     {
-                        actionIfTrue(x);
+                        y.actionIfTrue(x);
                     }
                     else
                     {
-                        actionIfFalse(x);
+                        y.actionIfFalse(x);
                     }
                 });
         }
