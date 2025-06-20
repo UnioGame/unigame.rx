@@ -62,7 +62,12 @@ namespace UniGame.Runtime.Rx
             }
         }
 
-        public ReactiveValue() {}
+        public ReactiveValue()
+        {
+            equalityComparer = EqualityComparer<T>.Default;
+            hasValue = false;
+            currentValue = default;
+        }
 
         public ReactiveValue(T value)
             : this(value, EqualityComparer<T>.Default)
@@ -71,6 +76,7 @@ namespace UniGame.Runtime.Rx
 
         public ReactiveValue(T value, IEqualityComparer<T>? equalityComparer)
         {
+            this.hasValue = true;
             this.equalityComparer = equalityComparer;
             OnValueChanging(ref value);
             currentValue = value;
