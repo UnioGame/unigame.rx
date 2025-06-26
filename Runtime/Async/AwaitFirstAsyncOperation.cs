@@ -12,7 +12,7 @@ namespace UniModules.UniGame.CoreModules.UniGame.Core.Runtime.Async
 
     public class AwaitFirstAsyncOperation<TData> : IPoolable, IDisposable
     {
-        private LifeTimeDefinition _lifeTime = new ();
+        private LifeTime _lifeTime = new ();
         private bool _valueInitialized = false;
         private TData _value;
     

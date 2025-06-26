@@ -18,7 +18,7 @@ namespace UniGame.Core.Runtime.DataStructure
         public bool сomplete = false;
         
         private List<ProgressNode> _progress = new();
-        private LifeTimeDefinition _lifeTime = new();
+        private LifeTime _lifeTime = new();
         private List<IProgress<float>> _reporters = new();
         
         public UniTask WaitForComplete()
@@ -86,7 +86,7 @@ namespace UniGame.Core.Runtime.DataStructure
         public float maxProgress = 100;
         public float currentProgress = 0;
         
-        private LifeTimeDefinition _lifeTime = new ();
+        private LifeTime _lifeTime = new ();
         private Subject<float> _progress = new();
 
         public void Connect(Action<float> progressAction)

@@ -15,7 +15,7 @@ namespace UniGame.Rx.Runtime
 
     public class AsyncState<TData, TResult> : IAsyncState<TData, TResult>
     {
-        private LifeTimeDefinition               _lifeTime;
+        private LifeTime               _lifeTime;
         private bool                             _isActive;
         private bool                             _isInitialized;
         private TData                            _data;
@@ -24,7 +24,7 @@ namespace UniGame.Rx.Runtime
 
         #region public properties
 
-        public ILifeTime LifeTime => _lifeTime = (_lifeTime ?? new LifeTimeDefinition());
+        public ILifeTime LifeTime => _lifeTime = (_lifeTime ?? new LifeTime());
 
         public bool IsActive => _isActive;
 
@@ -105,7 +105,7 @@ namespace UniGame.Rx.Runtime
         private void Initialize()
         {
             _isInitialized =   true;
-            _lifeTime      ??= new LifeTimeDefinition();
+            _lifeTime      ??= new LifeTime();
             _value         ??= new ReactiveValue<TResult>();
         }
     }
