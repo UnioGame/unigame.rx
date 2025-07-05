@@ -3,6 +3,8 @@
 namespace UniGame.Runtime.Rx.Extensions
 {
     using System;
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
     using Rx;
     using R3;
 
@@ -41,6 +43,21 @@ namespace UniGame.Runtime.Rx.Extensions
 
             return observer;
 
+        }
+        
+        public static Observable<T> FirstNotNull<T>(this Observable<T> source)
+        {
+            var result = source.Where(x => x != null);
+            return result;
+        }
+        
+        public static async UniTask<T> ReceiveFirstAsync<T>(this Observable<T> source, CancellationToken token = default)
+        {
+            var result = await source
+                .FirstNotNull()
+                .FirstAsync(cancellationToken: token);
+            
+            return result;
         }
 
         public static Observable<T> When<T>(this Observable<T> source, Predicate<T> predicate, Action<T> action)
