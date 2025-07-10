@@ -40,7 +40,7 @@ namespace UniModules.UniGame.CoreModules.UniGame.Core.Runtime.Async
         
         public void Release()
         {
-            _lifeTime.Release();
+            _lifeTime.Terminate();
             _valueInitialized = true;
             _value = default;
         }

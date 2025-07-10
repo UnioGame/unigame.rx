@@ -62,7 +62,7 @@
             return executionResult.result;
         }
 
-        public void Dispose() => _lifeTime.Release();
+        public void Dispose() => _lifeTime.Terminate();
 
         protected virtual UniTask OnInitializeAsync(TData value)
         {

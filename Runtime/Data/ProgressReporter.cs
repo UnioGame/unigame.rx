@@ -76,7 +76,7 @@ namespace UniGame.Core.Runtime.DataStructure
             }
             
             _progress.Clear();
-            _lifeTime.Release();
+            _lifeTime.Terminate();
         }
     }
 
@@ -104,7 +104,7 @@ namespace UniGame.Core.Runtime.DataStructure
 
         public void Release()
         {
-            _lifeTime.Release();
+            _lifeTime.Terminate();
         }
 
         public void Dispose() => Release();

@@ -92,7 +92,7 @@ namespace UniGame.Rx.Runtime
             await OnExit(data);
 
             _isActive = false;
-            _lifeTime?.Release();
+            _lifeTime?.Terminate();
         }
 
         protected virtual TResult          GetInitialExecutionValue()                         => default;
