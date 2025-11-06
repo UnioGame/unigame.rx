@@ -201,7 +201,8 @@ namespace UniGame.Runtime.Rx
 
             if (!nullable.HasValue)
             {
-                observer.OnNext(currentValue);
+                if(hasValue)
+                    observer.OnNext(currentValue);
                 lock (this)
                 {
                     ThrowIfDisposed();
