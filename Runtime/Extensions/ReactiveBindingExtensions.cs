@@ -163,6 +163,19 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                 .Bind(source.Where(source,static (x,y) => y.HasValue), asset.SetActive);
         }
         
+        public static TView Bind<TView>(this TView view, ReactiveValue<bool> source, IEnumerable<GameObject> assets)
+            where TView : ILifeTimeContext
+        {
+            return view.Bind(source, x =>
+            {
+                foreach (var gameObject in assets)
+                {
+                    if(gameObject==null) continue;
+                    gameObject.SetActive(x);
+                }
+            });
+        }
+        
         public static TView Bind<TView>(this TView view, Observable<bool> source, GameObject asset)
             where TView : ILifeTimeContext
         {
