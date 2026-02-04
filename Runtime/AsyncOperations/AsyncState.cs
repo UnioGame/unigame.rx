@@ -49,7 +49,7 @@ namespace UniGame.Rx.Runtime
             _value.Value = GetInitialExecutionValue();
 
             //if target value contains lifetime, then bind
-            var contextLifetime = data is ILifeTimeContext lifeTimeContext ? lifeTimeContext.LifeTime.Compose(LifeTime) : LifeTime;
+            var contextLifetime = LifeTime;
 
             _taskHandle = OnExecute(data, contextLifetime)
                 .AttachExternalCancellation(contextLifetime.Token)

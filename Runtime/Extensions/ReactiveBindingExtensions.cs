@@ -6,6 +6,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Cysharp.Threading.Tasks;
+    using DataFlow;
     using R3;
     using UniGame.Core.Runtime;
     using ReflectionUtils;
@@ -262,6 +263,13 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             where T : ILifeTimeContext
         {
             sender.LifeTime.AddDispose(disposable);
+            return sender;
+        }
+        
+        public static T BindRestart<T>(this T sender, LifeTime lifeTime)
+            where T : ILifeTimeContext
+        {
+            sender.LifeTime.AddCleanUpAction(lifeTime,static x => x.Restart());
             return sender;
         }
         
