@@ -33,13 +33,11 @@ namespace UniGame.Runtime.Rx.Extensions
         
         public static IDisposable SubscribeOnce(this Observable<Unit> observable,Action action)
         {
-            IDisposable subscribeDisposable = null;
-            subscribeDisposable = observable.Subscribe(_ =>
-            {
-                subscribeDisposable.Dispose();
-                action();
-            });
-            return subscribeDisposable;
+            var disposable = observable
+                .Take(1)
+                .Subscribe(action);
+            
+            return disposable;
         }
         
         public static IRecycleObserver<T> CreateRecycleObserver<T>(this object _, 

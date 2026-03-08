@@ -230,6 +230,12 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             return Bind<T,TValue>(sender, source, action, sender.LifeTime);
         }
         
+        public static T Bind<T,TData, TValue>(this T sender,TData data, Observable<TValue> source, Action<TValue,TData> action)
+            where T : ILifeTimeContext
+        {
+            return Bind<T,TData,TValue>(sender,data, source,action, sender.LifeTime);
+        }
+        
         public static T Bind<T, TValue, TFunc>(this T sender, ReactiveValue<TValue> source, Func<TFunc> action)
             where T : ILifeTimeContext
         {
@@ -427,6 +433,15 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                 action(value);
             
             return view;
+        }
+        
+        public static T Bind<T,TData, TValue>(this T sender,TData data, 
+            Observable<TValue> source, 
+            Action<TValue,TData> action, ILifeTime lifeTime)
+        {
+            if (action == null) return sender;
+            source.Subscribe(data,action).AddTo(lifeTime);
+            return sender;
         }
         
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, 

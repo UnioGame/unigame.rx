@@ -80,34 +80,19 @@ namespace UniGame.Runtime.Extension
 
         public static async UniTask<(bool IsCanceled, TValue Result)> AwaitFirstAsyncNoException<TValue>(this IObservable<TValue> value, ILifeTime lifeTime)
         {
-            return await AwaitFirstAsync(value, lifeTime).SuppressCancellationThrow();
+            return await AwaitFirstAsync(value, lifeTime.Token).SuppressCancellationThrow();
+        }
+        
+        public static async UniTask<TValue> AwaitFirstAsync<TValue>(this IObservable<TValue> value, ILifeTime lifeTime)
+        {
+            var result = await value.ToUniTask(true, lifeTime.Token);
+            return result;
         }
 
-        public static async UniTask<TValue> AwaitFirstAsync<TValue>(this IObservable<TValue> value, 
-            ILifeTime lifeTime)
+        public static async UniTask<TValue> AwaitFirstAsync<TValue>(this IObservable<TValue> value, CancellationToken token)
         {
-            CancellationTokenSource tokenSource = null;
-            
-#if UNITY_EDITOR
-            tokenSource = new CancellationTokenSource();
-            lifeTime.AwaitTimeoutLog(TimeSpan.FromMilliseconds(DefaultTimeOutMs),() => $"AwaitFirstAsync FOR {nameof(TValue)} FAILED")
-                .AttachExternalCancellation(tokenSource.Token)
-                .Forget();
-#endif
-            try
-            {
-                var result = await value.ToUniTask(true, lifeTime.Token);
-                return result;
-            }
-            finally
-            {
-#if UNITY_EDITOR
-                tokenSource?.Cancel();
-                tokenSource?.Dispose();
-#endif
-            }
-
-            return default;
+            var result = await value.ToUniTask(true, token);
+            return result;
         }
     }
 }
