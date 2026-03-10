@@ -325,7 +325,17 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             Action target)
             where TSource : ILifeTimeContext
         {
-            view.AddCleanUpAction(target);
+            view.LifeTime.AddCleanUpAction(target);
+            return view;
+        }
+        
+        public static TSource BindCleanUp<TSource,TData>(
+            this TSource view, 
+            TData data,
+            Action<TData> target)
+            where TSource : ILifeTimeContext
+        {
+            view.LifeTime.AddCleanUpAction(data,target);
             return view;
         }
         
