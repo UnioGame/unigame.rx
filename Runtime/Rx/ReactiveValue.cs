@@ -6,6 +6,7 @@ namespace UniGame.Runtime.Rx
     using System.Collections.Generic;
     using System.Threading;
     using R3;
+    using UnityEngine;
 
     [Serializable]
     public class ReactiveValue<T> : ReadOnlyReactiveProperty<T>,
@@ -19,10 +20,13 @@ namespace UniGame.Runtime.Rx
         private const byte Disposed = 3;
         private byte completeState;
         private Exception? error;
+        
+        [SerializeField]
         private T currentValue;
-        private IEqualityComparer<T>? equalityComparer;
+        [SerializeField]
         private bool hasValue;
         
+        private IEqualityComparer<T>? equalityComparer;
         private ObserverNode
 #nullable enable
             ? root;
