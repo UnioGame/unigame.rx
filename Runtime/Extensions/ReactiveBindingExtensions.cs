@@ -233,15 +233,130 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         public static T Bind<T,TData, TValue>(this T sender,TData data, Observable<TValue> source, Action<TValue,TData> action)
             where T : ILifeTimeContext
         {
-            return Bind<T,TData,TValue>(sender,data, source,action, sender.LifeTime);
+            return sender.Bind(data, source, action, sender.LifeTime);
         }
         
+        public static T BindData<T,TData, TValue>(this T sender,TData data, Observable<TValue> source, Action<TData> action)
+            where T : ILifeTimeContext
+        {
+            if (action == null || sender == null) return sender;
+            
+            source.Select(data,static (x,y) => y)
+                .Subscribe(action).AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+        
+        public static T BindData<T,TData, TValue>(this T sender,TData data, Observable<TValue> source, Func<TData,UniTask> action)
+            where T : ILifeTimeContext
+        {
+            if (action == null || sender == null) return sender;
+            
+            source.Select(data,static (x,y) => y)
+                .Subscribe(action,static (x,y) => y?.Invoke(x).Forget())
+                .AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+        
+        public static T BindData<T,TData, TValue>(this T sender,TData data, Observable<TValue> source, Action<TValue,BindData<T,TData>> action)
+            where T : ILifeTimeContext
+        {
+            var bindData = new BindData<T,TData>()
+            {
+                Source = sender,
+                Value = data,
+            };
+            
+            return sender.Bind(bindData, source, action, sender.LifeTime);
+        }
+        
+        public static T BindData<T,TValue>(this T sender, Observable<TValue> source, Action<BindData<T,TValue>> action) 
+            where T : ILifeTimeContext
+        {
+            if (action == null || source == null) return sender;
+            
+            source.Select(sender,static (x,y) => new BindData<T, TValue>()
+            {
+                Source = y,
+                Value = x,
+            }).Subscribe(action).AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+        
+        public static T BindData<T,TValue>(this T sender, Observable<TValue> source, Func<BindData<T,TValue>,UniTask> action) 
+            where T : ILifeTimeContext
+        {
+            if (action == null || source == null) return sender;
+            
+            source.Select(sender,static (x,y) => new BindData<T, TValue>()
+            {
+                Source = y,
+                Value = x,
+            }).Subscribe(action,static (x,y) => y?.Invoke(x)
+                .AttachExternalCancellation(x.Source.LifeTime.Token).Forget())
+                .AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+        
+        public static T BindData<T,TData, TValue>(this T sender,
+            TData data, 
+            Observable<TValue> source, 
+            Action<BindData<T,TData,TValue>> action) where T : ILifeTimeContext
+        {
+            if (action == null || source == null) return sender;
+            
+            var context = new BindData<T,TData>()
+            {
+                Source = sender,
+                Value = data,
+            };
+            
+            var observable  = source.Select(context,static (x,y) => new BindData<T, TData, TValue>()
+            {
+                Source = y.Source,
+                Data = y.Value,
+                Value = x,
+            });
+            observable.Subscribe(action).AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+        
+        public static T BindData<T,TData, TValue>(this T sender,
+            TData data, 
+            Observable<TValue> source, 
+            Func<BindData<T,TData,TValue>,UniTask> action) where T : ILifeTimeContext
+        {
+            if (action == null || source == null) return sender;
+            
+            var context = new BindData<T,TData>()
+            {
+                Source = sender,
+                Value = data,
+            };
+            
+            var observable  = source.Select(context,static (x,y) => new BindData<T, TData, TValue>()
+            {
+                Source = y.Source,
+                Data = y.Value,
+                Value = x,
+            });
+                
+            observable.Subscribe(action,static (x,y) 
+                    => y?.Invoke(x).AttachExternalCancellation(x.Source.LifeTime.Token).Forget())
+                .AddTo(sender.LifeTime);
+            
+            return sender;
+        }
+
+
         public static T Bind<T, TValue, TFunc>(this T sender, ReactiveValue<TValue> source, Func<TFunc> action)
             where T : ILifeTimeContext
         {
-            return Bind(sender, 
-                source.Where(source,static (x,y) => y.HasValue),
-                action);
+            return sender.Bind(source.Where(source,static (x,y) => y.HasValue), action);
         }
 
         public static T Bind<T, TValue, TFunc>(this T sender, Observable<TValue> source, Func<TFunc> action)
