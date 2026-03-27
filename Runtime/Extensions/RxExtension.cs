@@ -28,7 +28,7 @@ namespace UniGame.Runtime.Rx.Extensions
         
         public static IDisposable Subscribe(this Observable<Unit> observable,Action action)
         {
-            return observable.Subscribe(action,(x,y) => y());
+            return observable.Subscribe(action,static (x,y) => y());
         }
         
         public static IDisposable SubscribeOnce(this Observable<Unit> observable,Action action)
