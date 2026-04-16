@@ -153,6 +153,226 @@ public class MyComponent : MonoBehaviour, ILifeTimeContext
 }
 ```
 
+#### Choose the Binding Entry Point
+
+Use the receiver to express who owns the subscription:
+
+| Entry point | Use when | Typical overloads |
+|-------------|----------|-------------------|
+| `this.Bind(...)` | A view, presenter, or MonoBehaviour already implements `ILifeTimeContext` | `Bind(source, Action<T>)`, `Bind(source, Func<T, UniTask>)`, `Bind(source, GameObject)` |
+| `lifeTime.Bind(...)` | A service, test, or pure runtime object only has `ILifeTime` | `Bind(source, Action<T>)`, `Bind(source, Func<UniTask>)` |
+| `Bind(data, source, ...)` | The callback needs extra data without capturing outer variables | `Bind(data, source, Action<TValue, TData>)` |
+| `BindData(...)` | The callback needs sender + extra data + current value without closure allocations | `BindData(source, Action<BindData<TSender, TValue>>)` |
+
+#### Binding Families
+
+`ReactiveBindingExtensions` is intentionally broad. In practice the overloads fall into a few predictable groups:
+
+| Family | Typical targets | What it solves |
+|--------|------------------|----------------|
+| Direct action bindings | `Action<T>`, `Action`, `Action<TSender, T>` | Subscribe and execute sync callbacks with lifetime ownership |
+| Reactive target bindings | `ReactiveValue<T>`, `ReactiveProperty<T>`, `ISubject<T>` | Forward values into another reactive container |
+| Async bindings | `Func<T, UniTask>`, `Func<UniTask>` | Fire async work per event with automatic cancellation on lifetime end |
+| Bool/UI helpers | `GameObject`, `IEnumerable<GameObject>`, `BindNot(...)` | Toggle active state and avoid repetitive `SetActive` plumbing |
+| Command bindings | `ReactiveCommand<T>`, `ReactiveCommand<Unit>` | Route observable values into command execution with `CanExecute()` checks |
+| Conditional & timer bindings | `BindIf`, `BindWhere`, `BindIntervalUpdate` | Add guards and periodic updates without manual timer setup |
+| Cleanup bindings | `BindDispose`, `BindCleanUp`, `BindRestart` | Tie cleanup and restart logic to the same lifetime contract |
+| Reflection bindings | `MethodInfo` | Bind a stream to a method dynamically when static wiring is not practical |
+
+#### Common Binding Patterns
+
+##### 1. Bind a value stream to a callback
+
+```csharp
+private readonly ReactiveValue<int> _coins = new();
+
+void Start()
+{
+    this.Bind(_coins, value => coinsText.text = value.ToString());
+}
+```
+
+##### 2. Forward one reactive source into another
+
+```csharp
+private readonly ReactiveValue<int> _source = new();
+private readonly ReactiveValue<int> _target = new();
+
+void Start()
+{
+    this.Bind(_source, _target);
+}
+```
+
+##### 3. Bind bool state to visibility
+
+```csharp
+private Observable<bool> _visibilityStream;
+
+void Start()
+{
+    this.Bind(_visibilityStream, contentRoot);
+    this.BindNot(_visibilityStream, loadingOverlay);
+}
+```
+
+##### 4. Run async logic per event with automatic cancellation
+
+```csharp
+void Start()
+{
+    this.Bind(saveRequests, async request =>
+    {
+        await SaveProfile(request);
+    });
+}
+```
+
+##### 5. Execute commands from a stream
+
+```csharp
+private readonly ReactiveCommand<int> _selectLevelCommand = new();
+
+void Start()
+{
+    this.Bind(selectedLevel, _selectLevelCommand, LifeTime);
+}
+```
+
+##### 6. Register cleanup with the same fluent style
+
+```csharp
+void Start()
+{
+    this.BindCleanUp(() => Disconnect());
+    this.BindDispose(_subscription);
+}
+```
+
+#### Allocation-Aware Binding Patterns
+
+If a callback needs external context, prefer overloads that thread data through the observable chain instead of capturing outer variables in a lambda.
+
+The simplest form is `Bind(data, source, Action<TValue, TData>)`:
+
+```csharp
+private Observable<int> _scoreStream;
+
+void Start()
+{
+    this.Bind(scoreLabel, _scoreStream, static (value, label) =>
+    {
+        label.text = value.ToString();
+    });
+}
+```
+
+That pattern keeps the callback explicit and avoids allocating a closure around `scoreLabel`.
+
+Use `BindData(...)` when the callback also needs the sender or when a single context struct is easier to pass around.
+
+##### `BindData<TSender, TValue>`
+
+```csharp
+private Observable<int> _scoreStream;
+
+void Start()
+{
+    this.BindData(_scoreStream, static context =>
+    {
+        context.Source.name = $"Score:{context.Value}";
+    });
+}
+```
+
+This overload packs `Source` and the emitted `Value` into a small struct.
+
+##### `BindData<TSender, TData>` plus emitted value
+
+```csharp
+private Observable<int> _scoreStream;
+
+void Start()
+{
+    this.BindData(scoreLabel, _scoreStream, static (value, context) =>
+    {
+        context.Value.text = value.ToString();
+    });
+}
+```
+
+This overload is useful when you need both the emitted value and some external data. Note that in `BindData<TSender, TData>` the field is named `Value`, but it stores the external data payload, not the emitted observable value.
+
+##### `BindData<TSender, TData, TValue>` full context
+
+```csharp
+private Observable<int> _scoreStream;
+
+void Start()
+{
+    this.BindData(scoreLabel, _scoreStream, static context =>
+    {
+        context.Data.text = $"{context.Source.name}: {context.Value}";
+    });
+}
+```
+
+This is the most self-descriptive shape when the callback needs all three pieces of information:
+
+- `Source`: the lifetime owner that created the binding
+- `Data`: external context passed into the bind call
+- `Value`: the emitted observable value
+
+Use these overloads when subscriptions are created frequently or when UI code tends to capture multiple external references.
+
+#### Reflection Binding
+
+`Bind(source, MethodInfo)` exists for dynamic binding scenarios and supports methods with either no arguments or a single argument matching the observable value type.
+
+```csharp
+var method = GetType().GetMethod(nameof(HandleReward), BindingFlags.Instance | BindingFlags.NonPublic);
+this.Bind(rewardStream, method);
+```
+
+Internally this path uses `ArrayPool<object>` for parameter packing, but it is still less explicit and slower than direct typed overloads. Prefer typed `Bind(...)` methods whenever the target method is known at compile time.
+
+#### Subscription Helpers Around Bindings
+
+`ReactiveBindingExtensions` works best together with helpers from `RxExtension` and `RxLifetimeExtension`.
+
+##### Reuse observers with pooling
+
+```csharp
+var observer = this.CreateRecycleObserver<int>(value => Debug.Log(value));
+numberStream.Subscribe(observer).AddTo(LifeTime);
+```
+
+Use `CreateRecycleObserver()` when the same observer shape is created often and you want to reuse pooled observer instances.
+
+##### Add side effects without breaking the stream
+
+```csharp
+healthStream
+    .WhenTrue(_ => damageFlash.Play())
+    .Subscribe()
+    .AddTo(LifeTime);
+```
+
+`When`, `WhenTrue`, and `WhenFalse` are good for readable side effects while keeping the observable chain intact.
+
+##### Bind classic events to lifetime
+
+```csharp
+public event Action Closed;
+
+void Start()
+{
+    LifeTime.BindEvent(Closed, OnClosed);
+}
+```
+
+`BindEvent(...)` gives regular C# events the same lifetime discipline as reactive subscriptions.
+
 ### Interval Updates
 
 ```csharp
@@ -601,18 +821,21 @@ boolObservable
 
 ## 📋 Best Practices
 
-1. **Always use LifeTime**: Bind subscriptions to object lifecycles
-2. **Prefer composition**: Use interfaces instead of inheritance
-3. **Handle errors**: Use try-catch in asynchronous operations
-4. **Optimize subscriptions**: Unsubscribe from unused Observables
-5. **Use pooling**: Apply object pools for frequently created objects
+1. **Always bind to a lifetime**: Prefer `this.Bind(...)` or `lifeTime.Bind(...)` over raw subscriptions in gameplay code.
+2. **Use the narrowest overload**: Choose a typed overload before reaching for reflection-based binding.
+3. **Thread data explicitly**: Prefer `Bind(data, source, ...)` or `BindData(...)` when a callback needs external context.
+4. **Keep async callbacks cancellation-aware**: Let the provided lifetime handle `UniTask` cancellation instead of building parallel cancellation logic.
+5. **Reserve reflection for dynamic cases**: `MethodInfo` binding is flexible, but typed callbacks are clearer and cheaper.
 
 ## 🎯 Performance Tips
 
-- Use `SetValueForce()` only when necessary
-- Prefer `AwaitFirstAsyncNoException()` for cancellation handling
-- Apply `CreateRecycleObserver()` for observer reuse
-- Use specialized types (`IntReactiveValue`, `BoolReactiveValue`) for better performance
+- Prefer overloads that pass external data explicitly: `Bind(data, source, ...)` and `BindData(...)` avoid common closure captures.
+- Use `static` lambdas or method groups with binding callbacks whenever possible.
+- Apply `CreateRecycleObserver()` when identical observer shapes are created frequently.
+- Use specialized types (`IntReactiveValue`, `BoolReactiveValue`) when hot paths benefit from clearer intent and better runtime behavior.
+- Prefer `AwaitFirstAsyncNoException()` for cancellation-heavy flows where exceptions would only add noise.
+- Use `SetValueForce()` only when you really need to bypass equality checks.
+- Keep `Bind(source, MethodInfo)` for tooling or dynamic composition; direct typed overloads are the faster path.
 
 ## 🔗 Integration Examples
 
