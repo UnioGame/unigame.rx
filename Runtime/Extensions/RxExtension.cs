@@ -25,6 +25,11 @@ namespace UniGame.Runtime.Rx.Extensions
         {
             return observable.Subscribe(action,(x,y) => y());
         }
+
+        public static IDisposable Subscribe<T>(this ReactiveValue<T> observable,Action<T> action)
+        {
+            return observable.Subscribe(action,(x,y) => y(x));
+        }
         
         public static IDisposable Subscribe(this Observable<Unit> observable,Action action)
         {
