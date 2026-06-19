@@ -219,9 +219,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         public static T Bind<T, TValue>(this T sender, ReactiveValue<TValue> source, Action<TValue> action)
             where T : ILifeTimeContext
         {
-            return Bind<T,TValue>(sender, 
-                source.Where(source,static (x,y) => y.HasValue), 
-                action, sender.LifeTime);
+            return Bind<T,TValue>(sender, source.Where(source,static (x,y) => y.HasValue), action, sender.LifeTime);
         }
         
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action<TValue> action)
@@ -572,7 +570,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, 
             Action<TValue> action, ILifeTime lifeTime)
         {
-            if (action == null) return sender;
+            if (sender == null || action == null || lifeTime.IsTerminated) return sender;
             source.Subscribe(action).AddTo(lifeTime);
             return sender;
         }
