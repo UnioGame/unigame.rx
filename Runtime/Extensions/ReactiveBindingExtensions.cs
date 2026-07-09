@@ -23,7 +23,16 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             IObserver<Unit> observer)
             where TView : ILifeTimeContext
         {
-            return view.Bind(source,x => observer.OnNext(Unit.Default));
+            return view.Bind(observer,source,static (x,y) => y.OnNext(Unit.Default));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TView Bind<TView,TValue>(this TView view, 
+            Observable<TValue> source, 
+            Action<TView> action)
+            where TView : ILifeTimeContext
+        {
+            return view.BindData(action, source, static (x, y) => y.Value?.Invoke(y.Source));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,7 +146,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         {
             if (value == null || source == null) return view;
             
-            return view.Bind(source, x =>
+            return Bind<TView, TValue>(view, source, (Action<TValue>)(x =>
             {
                 var parameters = value.GetParametersInfo();
                 switch (parameters.Length)
@@ -154,7 +163,7 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
                         ArrayPool<object>.Shared.Return(args);
                         return;
                 }
-            });
+            }));
         }
         
         public static TView Bind<TView>(this TView view, ReactiveValue<bool> source, GameObject asset)
