@@ -410,15 +410,21 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
         public static T Bind<T, TValue>(this T sender, Observable<TValue> source, Action action)
             where T : ILifeTimeContext
         {
-            return action == null ? sender : Bind<T,TValue>(sender, source, x => action(), sender.LifeTime);
+            if (sender == null || action == null || sender.LifeTime.IsTerminated)
+                return sender;
+
+            source.Subscribe(action, static (_, callback) => callback())
+                .AddTo(sender.LifeTime);
+            return sender;
         }
         
         public static ILifeTime Bind<TValue>(this ILifeTime sender, 
             Observable<TValue> source, Action action)
         {
-            return action == null 
-                ? sender 
-                : Bind(sender, source, x => action());
+            if (action == null) return sender;
+            source.Subscribe(action, static (_, callback) => callback())
+                .AddTo(sender);
+            return sender;
         }
         
         public static TResult BindConvert<TResult,T, TValue>(this T sender,Func<T,TResult> converter, Observable<TValue> source, Action action)
@@ -661,9 +667,10 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             ILifeTime lifeTime)
         {
             if (action == null) return sender;
-            
+
+            var bindState = (sender, action);
             source.Where(source, static (x,y) => y.HasValue)
-                .Subscribe(action,(x,y) => y(sender,x))
+                .Subscribe(bindState, static (value, state) => state.action(state.sender, value))
                 .AddTo(lifeTime);
             
             return sender;
@@ -674,7 +681,8 @@ namespace UniGame.Runtime.Rx.Runtime.Extensions
             ILifeTime lifeTime)
         {
             if (action == null) return sender;
-            source.Subscribe(action,(x,y) => y(sender,x))
+            var bindState = (sender, action);
+            source.Subscribe(bindState, static (value, state) => state.action(state.sender, value))
                 .AddTo(lifeTime);
             return sender;
         }
