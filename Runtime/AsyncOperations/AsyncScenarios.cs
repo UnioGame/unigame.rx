@@ -1,4 +1,4 @@
-﻿namespace UniGame.Rx.Runtime
+namespace UniGame.Rx.Runtime
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@
         #region inspector
         
 #if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.ListDrawerSettings(Expanded = true)]
+        [Sirenix.OdinInspector.ListDrawerSettings(ShowFoldout = true)]
 #endif
         [SerializeReference]
         public List<TCommand> commands = new List<TCommand>();
